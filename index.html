@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生字学习 · 4A-4B</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7/dist/hanzi-writer.min.js"></script>
+<style>
+  :root {
+    --cream: #EAF6FD;
+    --beige: #D6EAF8;
+    --blush: #BFE0F2;
+    --dusty-rose: #4FB4E8;
+    --deep-green: #1B4965;
+    --sage: #3E8FC4;
+    --sage-light: #AEDFF7;
+    --charcoal: #1F2E3D;
+    --mid: #5B7A91;
+    --light-text: #9FBED1;
+    --white: #FFFFFF;
+    --correct: #2F9E6B;
+    --wrong: #FF6B81;
+    --correct-bg: #E3F7EF;
+    --wrong-bg: #FFE8ED;
+    --write-tag: #2E6DA4;
+    --write-tag-bg: #DCEEFB;
+    --read-tag: #6C63A8;
+    --read-tag-bg: #ECE8F8;
+    --shadow: 0 2px 20px rgba(31,46,61,0.08);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: var(--deep-green);
+    color: var(--cream);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .header-left h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+  .header-left p {
+    font-size: 0.68rem;
+    color: var(--sage-light);
+    margin-top: 2px;
+  }
+  .back-arrow {
+    display: none;
+    font-size: 1.1rem;
+    color: var(--sage-light);
+  }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .score-pill, .streak-pill {
+    background: rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+  .streak-pill { background: rgba(79,180,232,0.18); color: var(--blush); font-weight: 600; }
+  .score-pill span { color: var(--sage-light); font-size: 0.68rem; }
+
+  main { flex: 1; max-width: 760px; margin: 0 auto; width: 100%; padding: 24px 18px 60px; }
+
+  /* ── UNIT SELECT ── */
+  .intro-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    color: var(--deep-green);
+    line-height: 1.25;
+    margin-bottom: 6px;
+  }
+  .intro-sub { font-size: 0.86rem; color: var(--mid); margin-bottom: 26px; }
+  .book-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--light-text);
+    margin: 22px 0 10px;
+  }
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .unit-card {
+    background: var(--white);
+    border: 2px solid var(--beige);
+    border-radius: var(--radius-sm);
+    padding: 14px 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .unit-card:hover { border-color: var(--sage); transform: translateY(-1px); }
+  .unit-card .u-name { font-weight: 700; font-size: 0.95rem; color: var(--charcoal); margin-bottom: 4px; }
+  .unit-card .u-count { font-size: 0.72rem; color: var(--mid); }
+  .unit-card .u-mastery { font-size: 0.68rem; color: var(--sage); margin-top: 4px; font-weight: 600; }
+  .unit-card.all-units { grid-column: 1 / -1; background: var(--deep-green); border-color: var(--deep-green); }
+  .unit-card.all-units .u-name, .unit-card.all-units .u-count { color: var(--cream); }
+  .unit-card.all-units .u-mastery { color: var(--sage-light); }
+
+  /* ── HOME SHELF / SHOP / BADGES ── */
+  .link-btn { background: none; border: none; color: var(--sage); text-decoration: underline; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.75rem; padding: 0; }
+  .exam-bank-card {
+    display: flex; align-items: center; gap: 14px; cursor: pointer;
+    background: linear-gradient(135deg, var(--deep-green), var(--sage));
+    color: var(--cream); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px 20px; margin-bottom: 18px; transition: transform 0.15s ease;
+  }
+  .exam-bank-card:hover { transform: translateY(-1px); }
+  .exam-bank-card .eb-icon { font-size: 1.8rem; }
+  .exam-bank-card .eb-body { flex: 1; }
+  .exam-bank-card .eb-title { font-weight: 700; font-size: 1rem; margin-bottom: 3px; }
+  .exam-bank-card .eb-desc { font-size: 0.78rem; opacity: 0.88; line-height: 1.4; }
+  .exam-bank-card .eb-arrow { font-size: 1.3rem; opacity: 0.8; }
+  .home-shelf { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; margin-bottom: 18px; }
+  .home-shelf-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .home-shelf-head h3 { font-family: 'DM Serif Display', serif; font-size: 1rem; margin: 0; color: var(--charcoal); font-weight: 400; }
+  .shelf-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .shelf-item { flex: 0 0 auto; width: 64px; text-align: center; }
+  .shelf-item .emoji { font-size: 26px; background: var(--cream); border: 2px solid var(--beige); border-radius: 14px; width: 54px; height: 50px; display: flex; align-items: center; justify-content: center; margin: 0 auto 4px; }
+  .shelf-item .sname { font-size: 0.6rem; color: var(--mid); font-weight: 700; line-height: 1.2; }
+  .shelf-empty { font-size: 0.78rem; color: var(--light-text); text-align: center; padding: 10px 4px; }
+
+  .points-banner { display: flex; align-items: center; justify-content: space-between; background: var(--white); border: 2px solid var(--beige); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 22px; }
+  .points-banner .num { font-family: 'DM Serif Display', serif; font-size: 1.7rem; color: var(--deep-green); }
+  .badges-section-label { font-family: 'DM Serif Display', serif; font-size: 1rem; margin: 20px 0 12px; color: var(--charcoal); }
+  .badges-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 10px; }
+  .badge-tile { background: var(--white); border: 2px solid var(--beige); border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: var(--shadow); }
+  .badge-tile .emoji { font-size: 28px; line-height: 1; }
+  .badge-tile.locked { opacity: 0.55; box-shadow: none; }
+  .badge-tile.locked .emoji { filter: grayscale(1); }
+  .badge-tile .bname { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.68rem; line-height: 1.2; color: var(--charcoal); }
+  .badge-tile .bdesc { font-size: 0.6rem; color: var(--mid); line-height: 1.25; }
+  .shop-tile { background: var(--white); border: 2px solid var(--beige); border-radius: var(--radius-sm); padding: 14px 10px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: var(--shadow); }
+  .shop-tile .emoji { font-size: 30px; }
+  .shop-tile .bname { font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.7rem; }
+  .shop-tile .cost { font-size: 0.68rem; color: var(--mid); font-weight: 700; }
+  .shop-tile .buy-btn { margin-top: 2px; font-size: 0.68rem; padding: 7px 12px; border: none; border-radius: var(--radius-sm); background: var(--deep-green); color: var(--cream); font-family: 'DM Sans', sans-serif; font-weight: 700; cursor: pointer; }
+  .shop-tile .buy-btn:hover { background: #123349; }
+  .shop-tile .buy-btn:disabled { opacity: 0.4; cursor: default; }
+  .shop-tile.owned { opacity: 0.9; }
+  .shop-tile.owned .owned-tag { font-size: 0.62rem; font-weight: 700; color: var(--correct); }
+
+  .toast {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: var(--deep-green); color: var(--cream); font-family: 'DM Sans', sans-serif; font-weight: 700;
+    font-size: 0.82rem; padding: 12px 20px; border-radius: 999px; box-shadow: var(--shadow);
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 999; pointer-events: none; text-align: center; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .badge-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(31,46,61,0.5); align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+  .badge-modal-overlay.show { display: flex; }
+  .badge-modal { background: var(--white); border-radius: var(--radius); padding: 34px 26px 26px; text-align: center; max-width: 300px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: badgePop 0.4s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes badgePop { 0%{ transform: scale(0.6); opacity:0; } 60%{ transform: scale(1.06); opacity:1; } 100%{ transform: scale(1); opacity:1; } }
+  .badge-modal-emoji { font-size: 58px; line-height: 1; margin-bottom: 10px; }
+  .badge-modal-label { font-family: 'DM Sans', sans-serif; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dusty-rose); font-weight: 700; margin-bottom: 6px; }
+  .badge-modal-name { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 6px; color: var(--charcoal); }
+  .badge-modal-desc { font-size: 0.82rem; color: var(--mid); margin-bottom: 20px; }
+
+  /* ── MODE SELECT ── */
+  .mode-header { text-align: center; margin-bottom: 24px; }
+  .mode-header .m-unit-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--deep-green);
+  }
+  .mode-header .m-unit-sub { font-size: 0.82rem; color: var(--mid); margin-top: 4px; }
+  .mode-grid { display: flex; flex-direction: column; gap: 12px; }
+  .mode-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-left: 4px solid var(--sage-light);
+  }
+  .mode-card:hover { transform: translateY(-2px); }
+  .mode-card .m-icon { font-size: 1.8rem; }
+  .mode-card .m-title { font-weight: 700; font-size: 1.02rem; color: var(--charcoal); margin-bottom: 3px; }
+  .mode-card .m-desc { font-size: 0.78rem; color: var(--mid); line-height: 1.4; }
+  .mode-card.disabled { opacity: 0.45; cursor: default; }
+  .mode-card.disabled:hover { transform: none; }
+  .back-link {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--mid);
+    margin-bottom: 18px;
+    cursor: pointer;
+  }
+  .back-link:hover { color: var(--deep-green); }
+
+  /* ── FLASHCARD (LEARN) ── */
+  .flash-progress { font-size: 0.75rem; color: var(--mid); margin-bottom: 14px; text-align: center; }
+  .flash-card-wrap { perspective: 1200px; margin-bottom: 20px; }
+  .flash-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 24px;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+  }
+  .flash-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--dusty-rose), var(--sage-light));
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+  }
+  .flash-type-tag {
+    position: absolute;
+    top: 16px; right: 16px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.03em;
+  }
+  .flash-type-tag.write { background: var(--write-tag-bg); color: var(--write-tag); }
+  .flash-type-tag.read { background: var(--read-tag-bg); color: var(--read-tag); }
+  .flash-char {
+    font-family: 'DM Serif Display', serif;
+    font-size: 4.5rem;
+    color: var(--charcoal);
+    line-height: 1;
+  }
+  .flash-hint { font-size: 0.78rem; color: var(--light-text); margin-top: 18px; }
+  .flash-back-pinyin { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.5rem; color: var(--sage); margin-bottom: 10px; }
+  .flash-back-meaning { font-size: 1.1rem; color: var(--charcoal); font-weight: 600; margin-bottom: 14px; }
+  .flash-back-compounds { font-size: 0.9rem; color: var(--mid); line-height: 1.7; padding-top: 12px; border-top: 1px solid var(--beige); width: 100%; }
+  .flash-actions { display: flex; gap: 10px; }
+  .flash-btn {
+    flex: 1;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .flash-btn.need-practice { background: var(--wrong-bg); color: var(--wrong); }
+  .flash-btn.need-practice:hover { background: #FFD2DC; }
+  .flash-btn.remembered { background: var(--correct-bg); color: var(--correct); }
+  .flash-btn.remembered:hover { background: #CDEFE1; }
+
+  /* ── QUIZ (shared with quiz-level tabs) ── */
+  .quiz-level-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .quiz-level-tabs button {
+    flex: 1;
+    background: var(--white);
+    border: 2px solid var(--beige);
+    border-radius: var(--radius-sm);
+    padding: 10px 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .quiz-level-tabs button.active { background: var(--deep-green); border-color: var(--deep-green); color: var(--cream); }
+  .quiz-level-tabs.write-mode-toggle { margin-bottom: 14px; }
+  .write-hidden-hint { font-size: 0.78rem; color: var(--light-text); margin-bottom: 10px; text-align: center; }
+
+  .progress-wrap { margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 6px; background: var(--beige); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--sage) 0%, var(--deep-green) 100%); border-radius: 99px; transition: width 0.4s ease; }
+  .progress-label { font-size: 0.72rem; color: var(--mid); white-space: nowrap; }
+
+  .question-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 30px 26px 22px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .question-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--dusty-rose), var(--sage-light));
+    border-top-left-radius: var(--radius); border-top-right-radius: var(--radius);
+  }
+  .q-eyebrow { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--light-text); margin-bottom: 12px; }
+  .q-text { font-family: 'DM Serif Display', serif; font-size: 2.8rem; color: var(--charcoal); margin-bottom: 6px; line-height: 1.2; }
+  .q-text.q-text-sentence { font-family: 'DM Sans', sans-serif; font-size: 1.3rem; font-weight: 500; line-height: 1.6; text-align: left; }
+  .q-sub { font-size: 0.85rem; color: var(--mid); font-style: italic; }
+
+  .timer-wrap { margin: 16px 0 0; display: flex; align-items: center; gap: 10px; }
+  .timer-track { flex: 1; height: 4px; background: var(--beige); border-radius: 99px; overflow: hidden; }
+  .timer-fill { height: 100%; background: var(--dusty-rose); border-radius: 99px; transition: width 1s linear; }
+  .timer-label { font-size: 0.72rem; color: var(--mid); min-width: 26px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .opt-btn {
+    background: var(--white); border: 2px solid var(--beige); border-radius: var(--radius-sm);
+    padding: 14px 16px; text-align: left; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; line-height: 1.4; color: var(--charcoal); transition: all 0.15s;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--sage); background: #F0F5F2; }
+  .opt-btn:disabled { cursor: default; }
+  .opt-letter {
+    display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; min-width: 22px;
+    border-radius: 50%; background: var(--beige); font-size: 0.65rem; font-weight: 700; color: var(--mid);
+  }
+  .opt-btn.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+  .opt-btn.correct .opt-letter { background: var(--correct); color: white; }
+  .opt-btn.wrong { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+  .opt-btn.wrong .opt-letter { background: var(--wrong); color: white; }
+  .opt-btn.reveal-correct { border-color: var(--correct); background: var(--correct-bg); color: var(--correct); }
+  .opt-btn.reveal-correct .opt-letter { background: var(--correct); color: white; }
+
+  .feedback-panel { background: var(--cream); border-radius: var(--radius-sm); padding: 16px 18px; margin-bottom: 12px; display: none; border-left: 3px solid var(--sage); }
+  .feedback-panel.show { display: block; }
+  .feedback-panel.wrong-fb { border-left-color: var(--dusty-rose); }
+  .feedback-result { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .feedback-result.ok { color: var(--correct); }
+  .feedback-result.no { color: var(--wrong); }
+  .feedback-detail { font-size: 0.84rem; color: var(--mid); line-height: 1.7; }
+  .feedback-detail strong { color: var(--charcoal); font-weight: 600; }
+
+  .next-btn {
+    width: 100%; background: var(--deep-green); color: var(--cream); border: none; border-radius: var(--radius-sm);
+    padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    display: none; letter-spacing: 0.02em;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { background: #123349; }
+
+  /* ── WRITE MODE ── */
+  .write-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px 22px; text-align: center; margin-bottom: 16px; position: relative; }
+  .write-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--dusty-rose), var(--sage-light)); border-top-left-radius: var(--radius); border-top-right-radius: var(--radius); }
+  .write-meta { font-size: 0.85rem; color: var(--mid); margin-bottom: 4px; }
+  .write-pinyin { font-family: 'DM Serif Display', serif; font-style: italic; font-size: 1.3rem; color: var(--sage); margin-bottom: 2px; }
+  .write-meaning { font-size: 0.95rem; color: var(--charcoal); font-weight: 600; margin-bottom: 16px; }
+  #hanzi-target { width: 260px; height: 260px; margin: 0 auto 16px; background: var(--cream); border-radius: var(--radius-sm); border: 2px dashed var(--beige); }
+  .write-controls { display: flex; gap: 10px; margin-bottom: 6px; }
+  .write-btn {
+    flex: 1; border: none; border-radius: var(--radius-sm); padding: 13px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .write-btn.demo { background: var(--beige); color: var(--charcoal); }
+  .write-btn.demo:hover { background: var(--blush); }
+  .write-btn.start { background: var(--deep-green); color: var(--cream); }
+  .write-btn.start:hover { background: #123349; }
+  .write-status { font-size: 0.82rem; color: var(--mid); margin-top: 12px; min-height: 20px; }
+  .write-status.ok { color: var(--correct); font-weight: 600; }
+  .write-progress { font-size: 0.75rem; color: var(--mid); text-align: center; margin-bottom: 14px; }
+
+  /* ── RESULTS ── */
+  #results-screen { text-align: center; }
+  .results-card { background: var(--white); border-radius: var(--radius); padding: 36px 28px; box-shadow: var(--shadow); margin-bottom: 20px; }
+  .results-emoji { font-size: 2.6rem; margin-bottom: 14px; }
+  .results-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--deep-green); margin-bottom: 8px; }
+  .results-subtitle { font-size: 0.88rem; color: var(--mid); margin-bottom: 24px; }
+  .results-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-box { background: var(--cream); border-radius: var(--radius-sm); padding: 14px 6px; }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 1.7rem; color: var(--deep-green); }
+  .stat-label { font-size: 0.66rem; color: var(--mid); text-transform: uppercase; letter-spacing: 0.06em; }
+  .struggle-list { text-align: left; margin-bottom: 20px; }
+  .struggle-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--light-text); margin-bottom: 10px; }
+  .struggle-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--cream); border-radius: var(--radius-sm); margin-bottom: 6px; font-size: 0.85rem; }
+  .struggle-count { font-size: 0.7rem; color: var(--wrong); background: var(--wrong-bg); padding: 2px 8px; border-radius: 20px; }
+  .results-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-primary, .btn-secondary {
+    flex: 1; border-radius: var(--radius-sm); padding: 14px 18px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.86rem; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-primary { background: var(--deep-green); color: var(--cream); border: none; }
+  .btn-primary:hover { background: #123349; }
+  .btn-secondary { background: var(--white); color: var(--deep-green); border: 2px solid var(--deep-green); }
+  .btn-secondary:hover { background: var(--cream); }
+
+  .share-card { background: var(--deep-green); color: var(--cream); border-radius: var(--radius); padding: 22px; margin-top: 14px; display: none; }
+  .share-card.show { display: block; }
+  .share-card h3 { font-family: 'DM Serif Display', serif; font-size: 0.98rem; margin-bottom: 12px; color: var(--sage-light); }
+  .share-text { background: rgba(255,255,255,0.1); border-radius: var(--radius-sm); padding: 14px; font-size: 0.8rem; line-height: 1.7; font-family: monospace; white-space: pre-wrap; margin-bottom: 12px; }
+  .copy-btn { background: var(--sage); color: white; border: none; border-radius: var(--radius-sm); padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+  .copy-btn:hover { background: var(--sage-light); color: var(--charcoal); }
+
+  .mistake-pill { cursor: pointer; }
+  .unit-card.mistake-callout { background: var(--wrong-bg); border-color: var(--dusty-rose); margin-bottom: 14px; }
+  .unit-card.mistake-callout .u-name { color: var(--wrong); }
+  .unit-card.mistake-callout .u-count { color: var(--mid); }
+
+  .mistake-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+  .mistake-item {
+    background: var(--white); border-radius: var(--radius-sm); box-shadow: var(--shadow);
+    padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px;
+  }
+  .mistake-char { font-family: 'DM Serif Display', serif; font-size: 1.9rem; color: var(--charcoal); min-width: 40px; }
+  .mistake-info { flex: 1; min-width: 0; }
+  .mistake-meta { font-size: 0.8rem; color: var(--mid); }
+  .mistake-meta strong { color: var(--charcoal); }
+  .mistake-sub-meta { font-size: 0.72rem; color: var(--light-text); margin-top: 2px; }
+  .mistake-badges { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .mistake-badge { font-size: 0.6rem; font-weight: 700; background: var(--wrong-bg); color: var(--wrong); padding: 2px 8px; border-radius: 20px; }
+  .mistake-remove {
+    background: none; border: 1px solid var(--beige); border-radius: 20px; padding: 7px 12px;
+    font-size: 0.72rem; color: var(--mid); cursor: pointer; white-space: nowrap; font-family: 'DM Sans', sans-serif;
+  }
+  .mistake-remove:hover { border-color: var(--sage); color: var(--sage); }
+  .mistake-empty { text-align: center; padding: 40px 0; color: var(--sage); font-weight: 600; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .question-card, .flash-card, .write-card { animation: slideUp 0.25s ease; }
+  @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.04); } 100% { transform: scale(1); } }
+  .opt-btn.correct { animation: pop 0.3s ease; }
+
+  @media (max-width: 500px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .q-text { font-size: 2.2rem; }
+    .q-text.q-text-sentence { font-size: 1.1rem; }
+    .flash-char { font-size: 3.6rem; }
+    .unit-grid { grid-template-columns: 1fr; }
+    header { padding: 12px 16px; }
+    main { padding: 18px 14px 40px; }
+    #hanzi-target { width: 220px; height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left" onclick="goHome()">
+    <span class="back-arrow" id="back-arrow">←</span>
+    <div>
+      <h1 id="header-title">生字学习</h1>
+      <p id="header-sub">4A · 4B 生字练习</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="streak-pill points-pill" id="points-pill" onclick="goToBadges()">⭐ <span id="points-count">0</span></div>
+    <div class="streak-pill mistake-pill" id="mistake-pill" onclick="goToMistakeBook()">📕 <span id="mistake-count">0</span></div>
+    <div class="streak-pill" id="streak-display" style="display:none;">🔥 0</div>
+    <div class="score-pill" id="score-display"><span>已掌握</span> 0</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- SCREEN 1: UNIT SELECT -->
+  <div class="screen active" id="unit-screen">
+    <div class="intro-title">选一个单元开始<br>读字 · 记意思 · 学写字</div>
+    <div class="intro-sub">每个生字都能读拼音、认意思；标注"识写字"的生字还能练习笔顺书写、语境选字。</div>
+
+    <div class="exam-bank-card" onclick="startExamBank()">
+      <div class="eb-icon">📝</div>
+      <div class="eb-body">
+        <div class="eb-title">综合测验卷 · 全单元随机抽题</div>
+        <div class="eb-desc">40 题，拼音、意思、语境选字混合出题 — 像做一份总复习卷</div>
+      </div>
+      <div class="eb-arrow">→</div>
+    </div>
+
+    <div class="home-shelf">
+      <div class="home-shelf-head">
+        <h3>🐧 我的企鹅岛</h3>
+        <button class="link-btn" onclick="goToBadges()">查看全部 & 商店 →</button>
+      </div>
+      <div class="shelf-row" id="homeShelfRow"></div>
+    </div>
+
+    <div id="mistake-callout-slot"></div>
+    <div class="unit-grid" id="unit-grid-4a"></div>
+    <div class="book-label">4B</div>
+    <div class="unit-grid" id="unit-grid-4b"></div>
+  </div>
+
+  <!-- SCREEN 2: MODE SELECT -->
+  <div class="screen" id="mode-screen">
+    <div class="back-link" onclick="goHome()">← 换一个单元</div>
+    <div class="mode-header">
+      <div class="m-unit-name" id="mode-unit-name">—</div>
+      <div class="m-unit-sub" id="mode-unit-sub">—</div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startLearn()">
+        <div class="m-icon">📖</div>
+        <div>
+          <div class="m-title">学习卡</div>
+          <div class="m-desc">逐字认读：拼音、意思、词语示例，自己标记"记得了"或"还要练习"</div>
+        </div>
+      </div>
+      <div class="mode-card" onclick="startQuiz()">
+        <div class="m-icon">✏️</div>
+        <div>
+          <div class="m-title">认字测验</div>
+          <div class="m-desc">选择题：看字选拼音，或看字选意思，计分、计连击</div>
+        </div>
+      </div>
+      <div class="mode-card" id="write-mode-card" onclick="startWrite()">
+        <div class="m-icon">🖌️</div>
+        <div>
+          <div class="m-title">写字练习</div>
+          <div class="m-desc" id="write-mode-desc">看笔顺动画，再照着描红练习书写（只练"识写字"）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: LEARN (FLASHCARD) -->
+  <div class="screen" id="learn-screen">
+    <div class="back-link" onclick="backToMode()">← 返回</div>
+    <div class="flash-progress" id="flash-progress">1 / 1</div>
+    <div class="flash-card-wrap">
+      <div class="flash-card" id="flash-card" onclick="flipCard()">
+        <span class="flash-type-tag" id="flash-type-tag"></span>
+        <div class="flash-char" id="flash-char-front">—</div>
+        <div class="flash-hint" id="flash-hint">点一下卡片，看拼音和意思</div>
+      </div>
+    </div>
+    <div class="flash-actions" id="flash-actions" style="display:none;">
+      <button class="flash-btn need-practice" onclick="flashNext(false)">还要练习</button>
+      <button class="flash-btn remembered" onclick="flashNext(true)">记得了 ✓</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: QUIZ -->
+  <div class="screen" id="quiz-screen">
+    <div class="back-link" onclick="backFromQuiz()">← 返回</div>
+    <div class="quiz-level-tabs" id="quiz-level-tabs">
+      <button class="active" id="qtab-pinyin" onclick="setQuizLevel('pinyin')">拼音测验</button>
+      <button id="qtab-meaning" onclick="setQuizLevel('meaning')">意思测验</button>
+      <button id="qtab-moe" onclick="setQuizLevel('moe')">语境选字</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+    <div class="question-card" id="q-card">
+      <div class="q-eyebrow" id="q-eyebrow">—</div>
+      <div class="q-text" id="q-text">—</div>
+      <div class="q-sub" id="q-sub"></div>
+      <div class="timer-wrap">
+        <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
+        <div class="timer-label" id="timer-label">20</div>
+      </div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-panel" id="feedback-panel">
+      <div class="feedback-result" id="fb-result"></div>
+      <div class="feedback-detail" id="fb-detail"></div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
+  </div>
+
+  <!-- SCREEN 5: WRITE -->
+  <div class="screen" id="write-screen">
+    <div class="back-link" onclick="backToMode()">← 返回</div>
+    <div class="quiz-level-tabs write-mode-toggle">
+      <button class="active" id="wm-practice" onclick="setWriteMode(false)">跟着写（有提示）</button>
+      <button id="wm-test" onclick="setWriteMode(true)">不看提示（测验）</button>
+    </div>
+    <div class="write-progress" id="write-progress">1 / 1</div>
+    <div class="write-card">
+      <div class="write-pinyin" id="write-pinyin">—</div>
+      <div class="write-meaning" id="write-meaning">—</div>
+      <div class="write-hidden-hint" id="write-hidden-hint" style="display:none;">看拼音和意思，凭记忆把字写出来 — 没有字形提示</div>
+      <div id="hanzi-target"></div>
+      <div class="write-controls" id="write-controls">
+        <button class="write-btn demo" id="demo-stroke-btn" onclick="demoStroke()">看笔顺</button>
+        <button class="write-btn start" onclick="startTrace()">开始描红</button>
+      </div>
+      <div class="write-status" id="write-status"></div>
+    </div>
+    <button class="next-btn" id="write-next-btn" onclick="nextWrite()">下一个字 →</button>
+  </div>
+
+  <!-- SCREEN 6: RESULTS -->
+  <div class="screen" id="results-screen">
+    <div class="results-card">
+      <div class="results-emoji" id="results-emoji">🌸</div>
+      <div class="results-title" id="results-title">完成！</div>
+      <div class="results-subtitle" id="results-subtitle"></div>
+      <div class="results-stats">
+        <div class="stat-box"><div class="stat-num" id="stat-correct">0</div><div class="stat-label">答对</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-score">0</div><div class="stat-label">得分</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-streak">0</div><div class="stat-label">最长连击</div></div>
+      </div>
+      <div class="struggle-list" id="struggle-list"></div>
+      <div class="results-actions">
+        <button class="btn-primary" onclick="retrySession()">再试一次</button>
+        <button class="btn-secondary" onclick="showShare()">📋 分享成绩</button>
+      </div>
+    </div>
+    <div class="share-card" id="share-card">
+      <h3>📩 发给老师 / 家长</h3>
+      <div class="share-text" id="share-text"></div>
+      <button class="copy-btn" onclick="copyShare()">复制文字</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 7: MISTAKE BOOK -->
+  <div class="screen" id="mistake-screen">
+    <div class="back-link" onclick="goHome()">← 返回首页</div>
+    <div class="intro-title" style="font-size:1.6rem;">错题本</div>
+    <div class="intro-sub" id="mistake-sub">还没有错题，继续加油！</div>
+    <div class="mistake-actions" id="mistake-actions" style="display:none;">
+      <button class="btn-primary" onclick="startMistakeReview()">开始复习错题</button>
+      <button class="btn-secondary" onclick="confirmClearMistakes()">清空错题本</button>
+    </div>
+    <div id="mistake-list"></div>
+  </div>
+
+  <!-- SCREEN 8: BADGES / SHOP -->
+  <div class="screen" id="badges-screen">
+    <div class="back-link" onclick="goHome()">← 返回首页</div>
+    <div class="intro-title" style="font-size:1.6rem;">我的徽章 & 企鹅商店</div>
+    <div class="intro-sub">答对题目、写对生字都能赚星星，用星星换可爱的小企鹅！</div>
+
+    <div class="points-banner">
+      <div>
+        <div style="font-size:0.72rem; color:var(--mid); font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">可用星星</div>
+        <div class="num" id="badgesPoints">0</div>
+      </div>
+      <div style="font-size:32px;">⭐</div>
+    </div>
+
+    <div class="badges-section-label">成就徽章</div>
+    <div class="badges-grid" id="achievementGrid"></div>
+
+    <div class="badges-section-label">🐧 企鹅商店 — 用星星兑换</div>
+    <div class="badges-grid" id="shopGrid"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="badge-modal-overlay" id="badgeModalOverlay">
+  <div class="badge-modal">
+    <div class="badge-modal-emoji" id="badgeModalEmoji">🐱</div>
+    <div class="badge-modal-label">✨ 新朋友来了！✨</div>
+    <div class="badge-modal-name" id="badgeModalName">—</div>
+    <div class="badge-modal-desc" id="badgeModalDesc">—</div>
+    <button class="btn btn-primary" style="width:100%; border:none; border-radius:var(--radius-sm); background:var(--deep-green); color:var(--cream); padding:14px; font-family:'DM Sans',sans-serif; font-weight:700; font-size:0.88rem; cursor:pointer;" id="badgeModalClose" onclick="closeBadgeModal()">太棒了！🎉</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────
+const ALL_WORDS = [{"unit": "4A-1", "char": "刚", "pinyin": "gāng", "meaning": "just, hard, steel", "compounds": "刚才 · 刚好 · 刚刚 · 坚刚", "type": "write"}, {"unit": "4A-1", "char": "外", "pinyin": "wài", "meaning": "outside, external", "compounds": "外面 · 国外 · 外国 · 意外", "type": "write"}, {"unit": "4A-1", "char": "建", "pinyin": "jiàn", "meaning": "to build, establish", "compounds": "建设 · 建立 · 建议 · 建造", "type": "write"}, {"unit": "4A-1", "char": "彩", "pinyin": "cǎi", "meaning": "color, variety", "compounds": "彩色 · 精彩 · 光彩 · 色彩", "type": "write"}, {"unit": "4A-1", "char": "拍", "pinyin": "pāi", "meaning": "to pat, clap, take photos", "compounds": "拍手 · 拍照 · 拍打 · 节拍", "type": "write"}, {"unit": "4A-1", "char": "讨", "pinyin": "tǎo", "meaning": "to discuss, ask for", "compounds": "讨论 · 讨厌 · 讨价 · 研讨", "type": "write"}, {"unit": "4A-1", "char": "论", "pinyin": "lùn", "meaning": "theory, discuss, opinion", "compounds": "讨论 · 理论 · 言论 · 评论", "type": "write"}, {"unit": "4A-1", "char": "部", "pinyin": "bù", "meaning": "part, section, ministry", "compounds": "部分 · 内部 · 全部 · 干部", "type": "write"}, {"unit": "4A-1", "char": "闻", "pinyin": "wén", "meaning": "to hear, smell, news", "compounds": "新闻 · 闻到 · 见闻 · 传闻", "type": "write"}, {"unit": "4A-1", "char": "众", "pinyin": "zhòng", "meaning": "crowd, many, public", "compounds": "观众 · 听众 · 群众 · 大众", "type": "read"}, {"unit": "4A-1", "char": "倦", "pinyin": "juàn", "meaning": "tired, weary", "compounds": "疲倦 · 厌倦 · 困倦", "type": "read"}, {"unit": "4A-1", "char": "内", "pinyin": "nèi", "meaning": "inside, internal, within", "compounds": "内部 · 国内 · 室内 · 内容", "type": "read"}, {"unit": "4A-1", "char": "况", "pinyin": "kuàng", "meaning": "situation, condition", "compounds": "情况 · 况且 · 现况", "type": "read"}, {"unit": "4A-1", "char": "剧", "pinyin": "jù", "meaning": "drama, play, severe", "compounds": "电视剧 · 话剧 · 京剧 · 剧场", "type": "read"}, {"unit": "4A-1", "char": "密", "pinyin": "mì", "meaning": "dense, close, secret", "compounds": "秘密 · 密切 · 密度 · 严密", "type": "read"}, {"unit": "4A-1", "char": "投", "pinyin": "tóu", "meaning": "to throw, cast, invest", "compounds": "投票 · 投资 · 投入 · 投降", "type": "read"}, {"unit": "4A-1", "char": "换", "pinyin": "huàn", "meaning": "to change, exchange", "compounds": "交换 · 换取 · 更换 · 兑换", "type": "read"}, {"unit": "4A-1", "char": "掌", "pinyin": "zhǎng", "meaning": "palm, to control", "compounds": "手掌 · 掌握 · 鼓掌 · 掌声", "type": "read"}, {"unit": "4A-1", "char": "播", "pinyin": "bō", "meaning": "to broadcast, sow", "compounds": "播放 · 广播 · 播种 · 直播", "type": "read"}, {"unit": "4A-1", "char": "疲", "pinyin": "pí", "meaning": "tired, weary", "compounds": "疲劳 · 疲倦 · 疲惫", "type": "read"}, {"unit": "4A-1", "char": "秘", "pinyin": "mì", "meaning": "secret, confidential", "compounds": "秘密 · 秘书 · 神秘 · 保密", "type": "read"}, {"unit": "4A-1", "char": "精", "pinyin": "jīng", "meaning": "essence, refined, spirit", "compounds": "精神 · 精彩 · 精确 · 精力", "type": "read"}, {"unit": "4A-1", "char": "续", "pinyin": "xù", "meaning": "to continue, extend", "compounds": "继续 · 连续 · 持续 · 陆续", "type": "read"}, {"unit": "4A-1", "char": "解", "pinyin": "jiě", "meaning": "to solve, understand, explain", "compounds": "解决 · 解答 · 解释 · 了解", "type": "read"}, {"unit": "4A-1", "char": "言", "pinyin": "yán", "meaning": "words, speech, to speak", "compounds": "语言 · 发言 · 言论 · 建议 · 争议", "type": "read"}, {"unit": "4A-1", "char": "议", "pinyin": "yì", "meaning": "to discuss, suggest", "compounds": "会议 · 议论 · 建议 · 争议", "type": "read"}, {"unit": "4A-1", "char": "蹈", "pinyin": "dào", "meaning": "to step on, dance", "compounds": "舞蹈 · 蹈海", "type": "read"}, {"unit": "4A-1", "char": "集", "pinyin": "jí", "meaning": "to gather, collect, episode", "compounds": "收集 · 集合 · 一集 · 文集", "type": "read"}, {"unit": "4A-1", "char": "预", "pinyin": "yù", "meaning": "in advance, beforehand", "compounds": "预习 · 预测 · 预定 · 预备", "type": "read"}, {"unit": "4A-2", "char": "串", "pinyin": "chuàn", "meaning": "string, series", "compounds": "一串 · 串联 · 串门", "type": "write"}, {"unit": "4A-2", "char": "乌", "pinyin": "wū", "meaning": "black, crow", "compounds": "乌云 · 乌鸦 · 乌黑", "type": "write"}, {"unit": "4A-2", "char": "怕", "pinyin": "pà", "meaning": "to fear, be afraid", "compounds": "害怕 · 可怕 · 恐怕", "type": "write"}, {"unit": "4A-2", "char": "急", "pinyin": "jí", "meaning": "urgent, anxious", "compounds": "着急 · 紧急 · 急忙 · 心急", "type": "write"}, {"unit": "4A-2", "char": "丸", "pinyin": "wán", "meaning": "pill, ball", "compounds": "药丸 · 丸子 · 肉丸", "type": "read"}, {"unit": "4A-2", "char": "倾", "pinyin": "qīng", "meaning": "to lean, incline, pour", "compounds": "倾听 · 倾向 · 倾斜 · 倾诉", "type": "read"}, {"unit": "4A-2", "char": "套", "pinyin": "tào", "meaning": "set, cover, suite", "compounds": "一套 · 套装 · 手套 · 外套", "type": "read"}, {"unit": "4A-2", "char": "姑", "pinyin": "gū", "meaning": "aunt (father's sister)", "compounds": "姑姑 · 姑妈 · 姑娘", "type": "read"}, {"unit": "4A-2", "char": "帽", "pinyin": "mào", "meaning": "hat, cap", "compounds": "帽子 · 戴帽子 · 红帽", "type": "read"}, {"unit": "4A-2", "char": "忽", "pinyin": "hū", "meaning": "suddenly, to neglect", "compounds": "忽然 · 忽略 · 忽视", "type": "read"}, {"unit": "4A-2", "char": "担", "pinyin": "dān", "meaning": "to carry, bear", "compounds": "担心 · 负担 · 承担 · 扁担", "type": "read"}, {"unit": "4A-2", "char": "挤", "pinyin": "jǐ", "meaning": "to squeeze, crowd", "compounds": "拥挤 · 挤压 · 排挤", "type": "read"}, {"unit": "4A-2", "char": "撑", "pinyin": "chēng", "meaning": "to support, prop up", "compounds": "支撑 · 撑开 · 撑伞", "type": "read"}, {"unit": "4A-2", "char": "暖", "pinyin": "nuǎn", "meaning": "warm", "compounds": "温暖 · 暖和 · 保暖 · 取暖", "type": "read"}, {"unit": "4A-2", "char": "棒", "pinyin": "bàng", "meaning": "stick, excellent", "compounds": "棒球 · 很棒 · 木棒 · 冰棒", "type": "read"}, {"unit": "4A-2", "char": "灵", "pinyin": "líng", "meaning": "spirit, clever, effective", "compounds": "灵活 · 心灵 · 精灵 · 灵感", "type": "read"}, {"unit": "4A-2", "char": "烟", "pinyin": "yān", "meaning": "smoke, cigarette", "compounds": "抽烟 · 烟火 · 香烟 · 烟雾", "type": "read"}, {"unit": "4A-2", "char": "示", "pinyin": "shì", "meaning": "to show, indicate", "compounds": "显示 · 表示 · 指示 · 示范", "type": "read"}, {"unit": "4A-2", "char": "苹", "pinyin": "píng", "meaning": "apple", "compounds": "苹果", "type": "read"}, {"unit": "4A-2", "char": "词", "pinyin": "cí", "meaning": "word, vocabulary", "compounds": "词语 · 生词 · 词典 · 单词", "type": "read"}, {"unit": "4A-2", "char": "递", "pinyin": "dì", "meaning": "to hand over, deliver", "compounds": "传递 · 递给 · 邮递 · 快递", "type": "read"}, {"unit": "4A-2", "char": "靠", "pinyin": "kào", "meaning": "to lean on, depend on", "compounds": "依靠 · 靠近 · 可靠", "type": "read"}, {"unit": "4A-2", "char": "鼓", "pinyin": "gǔ", "meaning": "drum, to encourage", "compounds": "打鼓 · 鼓励 · 鼓掌 · 手鼓", "type": "read"}, {"unit": "4A-3", "char": "偷", "pinyin": "tōu", "meaning": "to steal", "compounds": "偷窃 · 小偷 · 偷看", "type": "write"}, {"unit": "4A-3", "char": "您", "pinyin": "nín", "meaning": "you (polite)", "compounds": "您好 · 您的", "type": "write"}, {"unit": "4A-3", "char": "架", "pinyin": "jià", "meaning": "frame, shelf, to fight", "compounds": "书架 · 打架 · 一架", "type": "write"}, {"unit": "4A-3", "char": "近", "pinyin": "jìn", "meaning": "near, close", "compounds": "接近 · 附近 · 最近", "type": "write"}, {"unit": "4A-3", "char": "迷", "pinyin": "mí", "meaning": "to be confused, fan", "compounds": "迷路 · 球迷 · 着迷", "type": "read"}, {"unit": "4A-3", "char": "吞", "pinyin": "tūn", "meaning": "to swallow", "compounds": "吞下 · 吞咽 · 吞噬", "type": "read"}, {"unit": "4A-3", "char": "型", "pinyin": "xíng", "meaning": "model, type, mold", "compounds": "模型 · 类型 · 型号", "type": "read"}, {"unit": "4A-3", "char": "察", "pinyin": "chá", "meaning": "to examine, observe", "compounds": "警察 · 观察 · 检察", "type": "read"}, {"unit": "4A-3", "char": "尊", "pinyin": "zūn", "meaning": "to respect, honor", "compounds": "尊敬 · 尊重 · 尊贵", "type": "read"}, {"unit": "4A-3", "char": "悔", "pinyin": "huǐ", "meaning": "to regret, repent", "compounds": "后悔 · 悔恨 · 忏悔", "type": "read"}, {"unit": "4A-3", "char": "批", "pinyin": "pī", "meaning": "to criticize, batch", "compounds": "批评 · 批准 · 一批", "type": "read"}, {"unit": "4A-3", "char": "敬", "pinyin": "jìng", "meaning": "to respect, admire", "compounds": "尊敬 · 敬爱 · 致敬 · 敬礼", "type": "read"}, {"unit": "4A-3", "char": "模", "pinyin": "mó", "meaning": "model, pattern", "compounds": "模型 · 模范 · 模样 · 模仿", "type": "read"}, {"unit": "4A-3", "char": "泪", "pinyin": "lèi", "meaning": "tear, teardrop", "compounds": "眼泪 · 流泪 · 泪水", "type": "read"}, {"unit": "4A-3", "char": "睁", "pinyin": "zhēng", "meaning": "to open (eyes)", "compounds": "睁开 · 睁眼", "type": "read"}, {"unit": "4A-3", "char": "碗", "pinyin": "wǎn", "meaning": "bowl", "compounds": "饭碗 · 一碗 · 洗碗", "type": "read"}, {"unit": "4A-3", "char": "脾", "pinyin": "pí", "meaning": "spleen, temper", "compounds": "脾气 · 发脾气", "type": "read"}, {"unit": "4A-3", "char": "舍", "pinyin": "shè", "meaning": "to give up, house", "compounds": "宿舍 · 舍不得 · 舍弃", "type": "read"}, {"unit": "4A-3", "char": "落", "pinyin": "luò", "meaning": "to fall, drop", "compounds": "落下 · 下落 · 落叶", "type": "read"}, {"unit": "4A-3", "char": "补", "pinyin": "bǔ", "meaning": "to mend, supplement", "compounds": "补充 · 弥补 · 补习", "type": "read"}, {"unit": "4A-3", "char": "警", "pinyin": "jǐng", "meaning": "to warn, police", "compounds": "警察 · 警告 · 报警", "type": "read"}, {"unit": "4A-3", "char": "评", "pinyin": "píng", "meaning": "to comment, evaluate", "compounds": "批评 · 评价 · 点评", "type": "read"}, {"unit": "4A-3", "char": "谎", "pinyin": "huǎng", "meaning": "lie, falsehood", "compounds": "说谎 · 谎言 · 谎话", "type": "read"}, {"unit": "4A-3", "char": "辈", "pinyin": "bèi", "meaning": "generation, lifetime", "compounds": "长辈 · 同辈 · 一辈子", "type": "read"}, {"unit": "4A-3", "char": "醒", "pinyin": "xǐng", "meaning": "to wake up, sober", "compounds": "醒来 · 清醒 · 提醒", "type": "read"}, {"unit": "4A-4", "char": "净", "pinyin": "jìng", "meaning": "clean, pure, net", "compounds": "干净 · 洁净 · 净化", "type": "write"}, {"unit": "4A-4", "char": "意", "pinyin": "yì", "meaning": "meaning, intention", "compounds": "注意 · 意思 · 意见", "type": "write"}, {"unit": "4A-4", "char": "脚", "pinyin": "jiǎo", "meaning": "foot, leg", "compounds": "脚步 · 手脚 · 脚下", "type": "write"}, {"unit": "4A-4", "char": "静", "pinyin": "jìng", "meaning": "quiet, calm", "compounds": "安静 · 平静 · 宁静", "type": "write"}, {"unit": "4A-4", "char": "食", "pinyin": "shí", "meaning": "food, to eat", "compounds": "食物 · 粮食 · 饮食", "type": "write"}, {"unit": "4A-4", "char": "于", "pinyin": "yú", "meaning": "in, at, to", "compounds": "由于 · 对于 · 关于", "type": "read"}, {"unit": "4A-4", "char": "值", "pinyin": "zhí", "meaning": "value, worth, to be on duty", "compounds": "价值 · 值得 · 值班", "type": "read"}, {"unit": "4A-4", "char": "劝", "pinyin": "quàn", "meaning": "to advise, persuade", "compounds": "劝告 · 劝阻 · 规劝", "type": "read"}, {"unit": "4A-4", "char": "归", "pinyin": "guī", "meaning": "to return, belong to", "compounds": "归还 · 回归 · 归属", "type": "read"}, {"unit": "4A-4", "char": "扇", "pinyin": "shàn", "meaning": "fan, to fan", "compounds": "电扇 · 扇子 · 风扇", "type": "read"}, {"unit": "4A-4", "char": "插", "pinyin": "chā", "meaning": "to insert, plug in", "compounds": "插入 · 插座 · 插花", "type": "read"}, {"unit": "4A-4", "char": "擦", "pinyin": "cā", "meaning": "to wipe, rub", "compounds": "擦干 · 摩擦 · 擦掉", "type": "read"}, {"unit": "4A-4", "char": "注", "pinyin": "zhù", "meaning": "to pour, focus, note", "compounds": "注意 · 注册 · 注入", "type": "read"}, {"unit": "4A-4", "char": "由", "pinyin": "yóu", "meaning": "from, by, reason", "compounds": "由于 · 自由 · 原由", "type": "read"}, {"unit": "4A-4", "char": "皱", "pinyin": "zhòu", "meaning": "wrinkle, to frown", "compounds": "皱纹 · 皱眉", "type": "read"}, {"unit": "4A-4", "char": "眉", "pinyin": "méi", "meaning": "eyebrow", "compounds": "眉毛 · 皱眉 · 眉头", "type": "read"}, {"unit": "4A-4", "char": "纷", "pinyin": "fēn", "meaning": "numerous, confused", "compounds": "纷纷 · 纷争 · 缤纷", "type": "read"}, {"unit": "4A-4", "char": "耍", "pinyin": "shuǎ", "meaning": "to play, show off", "compounds": "玩耍 · 耍赖", "type": "read"}, {"unit": "4A-4", "char": "证", "pinyin": "zhèng", "meaning": "certificate, proof", "compounds": "证明 · 证书 · 身份证", "type": "read"}, {"unit": "4A-4", "char": "责", "pinyin": "zé", "meaning": "duty, responsibility", "compounds": "责任 · 负责 · 职责", "type": "read"}, {"unit": "4A-4", "char": "赞", "pinyin": "zàn", "meaning": "to praise, approve", "compounds": "赞美 · 赞成 · 称赞", "type": "read"}, {"unit": "4A-4", "char": "阅", "pinyin": "yuè", "meaning": "to read, review", "compounds": "阅读 · 阅览 · 审阅", "type": "read"}, {"unit": "4A-4", "char": "默", "pinyin": "mò", "meaning": "silent, quiet", "compounds": "沉默 · 默默 · 默写", "type": "read"}, {"unit": "4A-5", "char": "任", "pinyin": "rèn", "meaning": "to appoint, allow, task", "compounds": "任务 · 责任 · 担任", "type": "write"}, {"unit": "4A-5", "char": "伸", "pinyin": "shēn", "meaning": "to stretch, extend", "compounds": "伸手 · 延伸 · 伸展", "type": "write"}, {"unit": "4A-5", "char": "功", "pinyin": "gōng", "meaning": "merit, achievement, skill", "compounds": "成功 · 功课 · 功夫", "type": "write"}, {"unit": "4A-5", "char": "室", "pinyin": "shì", "meaning": "room, office", "compounds": "教室 · 办公室 · 卧室", "type": "write"}, {"unit": "4A-5", "char": "束", "pinyin": "shù", "meaning": "bundle, to tie up", "compounds": "一束 · 束缚 · 花束", "type": "write"}, {"unit": "4A-5", "char": "查", "pinyin": "chá", "meaning": "to check, investigate", "compounds": "检查 · 查看 · 调查", "type": "write"}, {"unit": "4A-5", "char": "检", "pinyin": "jiǎn", "meaning": "to examine, inspect", "compounds": "检查 · 检验 · 体检", "type": "write"}, {"unit": "4A-5", "char": "勇", "pinyin": "yǒng", "meaning": "brave, courageous", "compounds": "勇敢 · 勇气 · 英勇", "type": "read"}, {"unit": "4A-5", "char": "哇", "pinyin": "wa", "meaning": "exclamation of surprise", "compounds": "哇塞", "type": "read"}, {"unit": "4A-5", "char": "差", "pinyin": "chà", "meaning": "poor, lacking, wrong", "compounds": "差别 · 相差 · 差不多", "type": "read"}, {"unit": "4A-5", "char": "并", "pinyin": "bìng", "meaning": "and, also, together", "compounds": "并且 · 合并 · 一并", "type": "read"}, {"unit": "4A-5", "char": "微", "pinyin": "wēi", "meaning": "tiny, slight, micro", "compounds": "微小 · 微笑 · 微风", "type": "read"}, {"unit": "4A-5", "char": "戴", "pinyin": "dài", "meaning": "to wear, put on", "compounds": "戴帽子 · 佩戴", "type": "read"}, {"unit": "4A-5", "char": "松", "pinyin": "sōng", "meaning": "pine tree, loose, to relax", "compounds": "松树 · 放松 · 轻松", "type": "read"}, {"unit": "4A-5", "char": "澡", "pinyin": "zǎo", "meaning": "bath", "compounds": "洗澡 · 泡澡", "type": "read"}, {"unit": "4A-5", "char": "烧", "pinyin": "shāo", "meaning": "to burn, fever", "compounds": "烧火 · 发烧 · 烧饭", "type": "read"}, {"unit": "4A-5", "char": "继", "pinyin": "jì", "meaning": "to continue, succeed", "compounds": "继续 · 继承 · 后继", "type": "read"}, {"unit": "4A-5", "char": "育", "pinyin": "yù", "meaning": "to educate, raise", "compounds": "教育 · 体育 · 培育", "type": "read"}, {"unit": "4A-5", "char": "胆", "pinyin": "dǎn", "meaning": "gall bladder, courage", "compounds": "胆子 · 胆量 · 大胆", "type": "read"}, {"unit": "4A-5", "char": "药", "pinyin": "yào", "meaning": "medicine, drug", "compounds": "吃药 · 中药 · 药品", "type": "read"}, {"unit": "4A-5", "char": "针", "pinyin": "zhēn", "meaning": "needle, injection", "compounds": "打针 · 针对 · 指针", "type": "read"}, {"unit": "4A-5", "char": "闭", "pinyin": "bì", "meaning": "to close, shut", "compounds": "闭上 · 关闭 · 封闭", "type": "read"}, {"unit": "4A-5", "char": "闷", "pinyin": "mèn", "meaning": "stuffy, bored", "compounds": "闷热 · 苦闷", "type": "read"}, {"unit": "4A-5", "char": "防", "pinyin": "fáng", "meaning": "to prevent, defend", "compounds": "预防 · 防止 · 国防", "type": "read"}, {"unit": "4A-5", "char": "项", "pinyin": "xiàng", "meaning": "item, neck, project", "compounds": "项目 · 一项 · 项链", "type": "read"}, {"unit": "4A-5", "char": "骗", "pinyin": "piàn", "meaning": "to deceive, cheat", "compounds": "欺骗 · 骗子 · 受骗", "type": "read"}, {"unit": "4A-6", "char": "久", "pinyin": "jiǔ", "meaning": "long time, for a long time", "compounds": "很久 · 长久 · 永久", "type": "write"}, {"unit": "4A-6", "char": "健", "pinyin": "jiàn", "meaning": "strong, healthy", "compounds": "健康 · 健身 · 稳健", "type": "write"}, {"unit": "4A-6", "char": "军", "pinyin": "jūn", "meaning": "army, military", "compounds": "军人 · 军队 · 参军", "type": "write"}, {"unit": "4A-6", "char": "始", "pinyin": "shǐ", "meaning": "to begin, start", "compounds": "开始 · 始终 · 原始", "type": "write"}, {"unit": "4A-6", "char": "康", "pinyin": "kāng", "meaning": "healthy, peaceful", "compounds": "健康 · 安康 · 小康", "type": "write"}, {"unit": "4A-6", "char": "所", "pinyin": "suǒ", "meaning": "place, that which", "compounds": "所以 · 场所 · 厕所", "type": "write"}, {"unit": "4A-6", "char": "苦", "pinyin": "kǔ", "meaning": "bitter, suffering", "compounds": "辛苦 · 痛苦 · 苦难", "type": "write"}, {"unit": "4A-6", "char": "丰", "pinyin": "fēng", "meaning": "abundant, rich", "compounds": "丰富 · 丰收 · 丰满", "type": "read"}, {"unit": "4A-6", "char": "享", "pinyin": "xiǎng", "meaning": "to enjoy", "compounds": "享受 · 享有 · 分享", "type": "read"}, {"unit": "4A-6", "char": "励", "pinyin": "lì", "meaning": "to encourage", "compounds": "鼓励 · 奖励 · 激励", "type": "read"}, {"unit": "4A-6", "char": "啦", "pinyin": "la", "meaning": "particle indicating completion", "compounds": "好啦 · 来啦", "type": "read"}, {"unit": "4A-6", "char": "器", "pinyin": "qì", "meaning": "tool, instrument", "compounds": "武器 · 器具 · 容器", "type": "read"}, {"unit": "4A-6", "char": "团", "pinyin": "tuán", "meaning": "group, team, round", "compounds": "团体 · 团结 · 集团", "type": "read"}, {"unit": "4A-6", "char": "坚", "pinyin": "jiān", "meaning": "firm, strong, hard", "compounds": "坚持 · 坚强 · 坚决", "type": "read"}, {"unit": "4A-6", "char": "夫", "pinyin": "fū", "meaning": "husband, man", "compounds": "丈夫 · 夫妇 · 功夫", "type": "read"}, {"unit": "4A-6", "char": "富", "pinyin": "fù", "meaning": "rich, wealthy", "compounds": "丰富 · 富有 · 财富", "type": "read"}, {"unit": "4A-6", "char": "幸", "pinyin": "xìng", "meaning": "lucky, fortunate", "compounds": "幸福 · 幸运 · 不幸", "type": "read"}, {"unit": "4A-6", "char": "弃", "pinyin": "qì", "meaning": "to abandon, give up", "compounds": "放弃 · 抛弃 · 舍弃", "type": "read"}, {"unit": "4A-6", "char": "持", "pinyin": "chí", "meaning": "to hold, maintain", "compounds": "坚持 · 保持 · 持续", "type": "read"}, {"unit": "4A-6", "char": "握", "pinyin": "wò", "meaning": "to hold, grasp", "compounds": "握手 · 掌握 · 把握", "type": "read"}, {"unit": "4A-6", "char": "族", "pinyin": "zú", "meaning": "race, nationality, family", "compounds": "民族 · 家族 · 种族", "type": "read"}, {"unit": "4A-6", "char": "武", "pinyin": "wǔ", "meaning": "martial, military", "compounds": "武术 · 武器 · 文武", "type": "read"}, {"unit": "4A-6", "char": "段", "pinyin": "duàn", "meaning": "section, period", "compounds": "一段 · 阶段 · 段落", "type": "read"}, {"unit": "4A-6", "char": "登", "pinyin": "dēng", "meaning": "to climb, ascend, board", "compounds": "登山 · 登记 · 登台", "type": "read"}, {"unit": "4A-6", "char": "训", "pinyin": "xùn", "meaning": "to train, teach", "compounds": "训练 · 培训 · 教训", "type": "read"}, {"unit": "4A-6", "char": "辛", "pinyin": "xīn", "meaning": "hard work, suffering", "compounds": "辛苦 · 辛勤 · 辛酸", "type": "read"}, {"unit": "4A-6", "char": "迎", "pinyin": "yíng", "meaning": "to welcome, meet", "compounds": "欢迎 · 迎接 · 迎来", "type": "read"}, {"unit": "4A-7", "char": "思", "pinyin": "sī", "meaning": "to think, consider", "compounds": "思考 · 思想 · 意思", "type": "write"}, {"unit": "4A-7", "char": "抢", "pinyin": "qiǎng", "meaning": "to rob, snatch", "compounds": "抢劫 · 争抢 · 哄抢", "type": "write"}, {"unit": "4A-7", "char": "拼", "pinyin": "pīn", "meaning": "to piece together, spell", "compounds": "拼音 · 拼图 · 拼命", "type": "write"}, {"unit": "4A-7", "char": "摇", "pinyin": "yáo", "meaning": "to shake, sway", "compounds": "摇动 · 摇头 · 摇摆", "type": "write"}, {"unit": "4A-7", "char": "馆", "pinyin": "guǎn", "meaning": "hall, building", "compounds": "图书馆 · 博物馆 · 餐馆", "type": "write"}, {"unit": "4A-7", "char": "乎", "pinyin": "hū", "meaning": "particle, seeming", "compounds": "几乎 · 在乎", "type": "read"}, {"unit": "4A-7", "char": "乘", "pinyin": "chéng", "meaning": "to ride, multiply", "compounds": "乘坐 · 乘车 · 搭乘", "type": "read"}, {"unit": "4A-7", "char": "厢", "pinyin": "xiāng", "meaning": "wing room, carriage", "compounds": "车厢 · 厢房", "type": "read"}, {"unit": "4A-7", "char": "命", "pinyin": "mìng", "meaning": "life, fate, to order", "compounds": "生命 · 命令 · 拼命", "type": "read"}, {"unit": "4A-7", "char": "塑", "pinyin": "sù", "meaning": "to mold, plastic", "compounds": "塑料 · 塑造 · 雕塑", "type": "read"}, {"unit": "4A-7", "char": "妇", "pinyin": "fù", "meaning": "woman, married woman", "compounds": "妇女 · 孕妇 · 夫妇", "type": "read"}, {"unit": "4A-7", "char": "孕", "pinyin": "yùn", "meaning": "pregnant", "compounds": "怀孕 · 孕妇", "type": "read"}, {"unit": "4A-7", "char": "序", "pinyin": "xù", "meaning": "order, sequence", "compounds": "秩序 · 顺序 · 序号", "type": "read"}, {"unit": "4A-7", "char": "待", "pinyin": "dài", "meaning": "to treat, wait for", "compounds": "对待 · 等待 · 招待", "type": "read"}, {"unit": "4A-7", "char": "悄", "pinyin": "qiāo", "meaning": "quiet, secretly", "compounds": "悄悄 · 悄然", "type": "read"}, {"unit": "4A-7", "char": "料", "pinyin": "liào", "meaning": "material, to expect", "compounds": "塑料 · 材料 · 资料", "type": "read"}, {"unit": "4A-7", "char": "歉", "pinyin": "qiàn", "meaning": "apologetic, sorry", "compounds": "抱歉 · 道歉", "type": "read"}, {"unit": "4A-7", "char": "滚", "pinyin": "gǔn", "meaning": "to roll, boil", "compounds": "滚动 · 翻滚 · 滚水", "type": "read"}, {"unit": "4A-7", "char": "秩", "pinyin": "zhì", "meaning": "order, sequence", "compounds": "秩序 · 有序", "type": "read"}, {"unit": "4A-7", "char": "移", "pinyin": "yí", "meaning": "to move, shift", "compounds": "移动 · 转移 · 搬移", "type": "read"}, {"unit": "4A-7", "char": "约", "pinyin": "yuē", "meaning": "to make appointment, about", "compounds": "约会 · 大约 · 预约", "type": "read"}, {"unit": "4A-7", "char": "终", "pinyin": "zhōng", "meaning": "end, final", "compounds": "终于 · 始终 · 最终", "type": "read"}, {"unit": "4A-7", "char": "耐", "pinyin": "nài", "meaning": "to endure, patient", "compounds": "耐心 · 忍耐 · 耐久", "type": "read"}, {"unit": "4A-7", "char": "舅", "pinyin": "jiù", "meaning": "maternal uncle", "compounds": "舅舅 · 舅妈", "type": "read"}, {"unit": "4A-7", "char": "随", "pinyin": "suí", "meaning": "to follow, accompany", "compounds": "随着 · 跟随 · 随便", "type": "read"}, {"unit": "4A-8", "char": "司", "pinyin": "sī", "meaning": "company, department", "compounds": "公司 · 司机 · 司令", "type": "write"}, {"unit": "4A-8", "char": "救", "pinyin": "jiù", "meaning": "to save, rescue", "compounds": "救助 · 拯救 · 急救", "type": "write"}, {"unit": "4A-8", "char": "照", "pinyin": "zhào", "meaning": "to shine, take photos", "compounds": "照顾 · 照片 · 按照", "type": "write"}, {"unit": "4A-8", "char": "被", "pinyin": "bèi", "meaning": "by (passive marker), quilt", "compounds": "被子 · 被动 · 被迫", "type": "write"}, {"unit": "4A-8", "char": "顾", "pinyin": "gù", "meaning": "to look after, care for", "compounds": "照顾 · 顾客 · 不顾", "type": "write"}, {"unit": "4A-8", "char": "义", "pinyin": "yì", "meaning": "meaning, righteousness", "compounds": "意义 · 正义 · 义务", "type": "read"}, {"unit": "4A-8", "char": "则", "pinyin": "zé", "meaning": "rule, regulation, then", "compounds": "规则 · 原则 · 否则", "type": "read"}, {"unit": "4A-8", "char": "危", "pinyin": "wēi", "meaning": "danger, dangerous", "compounds": "危险 · 危机 · 危害", "type": "read"}, {"unit": "4A-8", "char": "另", "pinyin": "lìng", "meaning": "another, other", "compounds": "另外 · 另一个 · 另类", "type": "read"}, {"unit": "4A-8", "char": "困", "pinyin": "kùn", "meaning": "trapped, difficult", "compounds": "困难 · 贫困 · 困扰", "type": "read"}, {"unit": "4A-8", "char": "守", "pinyin": "shǒu", "meaning": "to guard, keep, abide by", "compounds": "遵守 · 守护 · 看守", "type": "read"}, {"unit": "4A-8", "char": "巨", "pinyin": "jù", "meaning": "huge, enormous", "compounds": "巨大 · 巨人 · 巨额", "type": "read"}, {"unit": "4A-8", "char": "扬", "pinyin": "yáng", "meaning": "to raise, publicize", "compounds": "表扬 · 宣扬 · 发扬", "type": "read"}, {"unit": "4A-8", "char": "挥", "pinyin": "huī", "meaning": "to wave, wield, swing", "compounds": "指挥 · 发挥 · 挥手", "type": "read"}, {"unit": "4A-8", "char": "标", "pinyin": "biāo", "meaning": "mark, sign, standard", "compounds": "标准 · 目标 · 商标", "type": "read"}, {"unit": "4A-8", "char": "祸", "pinyin": "huò", "meaning": "disaster, misfortune", "compounds": "灾祸 · 闯祸 · 祸害", "type": "read"}, {"unit": "4A-8", "char": "获", "pinyin": "huò", "meaning": "to obtain, gain", "compounds": "获得 · 收获 · 获取", "type": "read"}, {"unit": "4A-8", "char": "血", "pinyin": "xuè", "meaning": "blood", "compounds": "血液 · 流血 · 血缘", "type": "read"}, {"unit": "4A-8", "char": "规", "pinyin": "guī", "meaning": "rule, regulation", "compounds": "规则 · 规定 · 法规", "type": "read"}, {"unit": "4A-8", "char": "访", "pinyin": "fǎng", "meaning": "to visit, interview", "compounds": "访问 · 拜访 · 采访", "type": "read"}, {"unit": "4A-8", "char": "达", "pinyin": "dá", "meaning": "to reach, achieve", "compounds": "到达 · 达到 · 表达", "type": "read"}, {"unit": "4A-8", "char": "通", "pinyin": "tōng", "meaning": "to pass through, connect", "compounds": "交通 · 通过 · 普通", "type": "read"}, {"unit": "4A-8", "char": "遵", "pinyin": "zūn", "meaning": "to follow, obey", "compounds": "遵守 · 遵循 · 遵从", "type": "read"}, {"unit": "4A-8", "char": "险", "pinyin": "xiǎn", "meaning": "dangerous, risk, insurance", "compounds": "危险 · 保险 · 冒险", "type": "read"}, {"unit": "4A-8", "char": "顺", "pinyin": "shùn", "meaning": "smooth, obedient", "compounds": "顺利 · 顺序 · 顺从", "type": "read"}, {"unit": "4A-9", "char": "味", "pinyin": "wèi", "meaning": "taste, flavor", "compounds": "味道 · 口味 · 滋味", "type": "write"}, {"unit": "4A-9", "char": "居", "pinyin": "jū", "meaning": "to live, reside", "compounds": "居住 · 居民 · 家居", "type": "write"}, {"unit": "4A-9", "char": "店", "pinyin": "diàn", "meaning": "shop, store", "compounds": "商店 · 书店 · 饭店", "type": "write"}, {"unit": "4A-9", "char": "座", "pinyin": "zuò", "meaning": "seat, (measure word)", "compounds": "座位 · 一座 · 宝座", "type": "write"}, {"unit": "4A-9", "char": "清", "pinyin": "qīng", "meaning": "clear, clean, pure", "compounds": "清楚 · 清洁 · 清晨", "type": "write"}, {"unit": "4A-9", "char": "离", "pinyin": "lí", "meaning": "to leave, distance from", "compounds": "离开 · 距离 · 分离", "type": "write"}, {"unit": "4A-9", "char": "铁", "pinyin": "tiě", "meaning": "iron, metal", "compounds": "铁路 · 钢铁 · 地铁", "type": "write"}, {"unit": "4A-9", "char": "供", "pinyin": "gōng", "meaning": "to supply, provide", "compounds": "提供 · 供应 · 供给", "type": "read"}, {"unit": "4A-9", "char": "依", "pinyin": "yī", "meaning": "to depend on, according to", "compounds": "依靠 · 依然 · 依据", "type": "read"}, {"unit": "4A-9", "char": "其", "pinyin": "qí", "meaning": "his, her, its, that", "compounds": "其他 · 其中 · 尤其", "type": "read"}, {"unit": "4A-9", "char": "厌", "pinyin": "yàn", "meaning": "to dislike, be tired of", "compounds": "厌烦 · 讨厌 · 厌恶", "type": "read"}, {"unit": "4A-9", "char": "摊", "pinyin": "tān", "meaning": "stall, booth, to spread", "compounds": "摊位 · 小摊 · 地摊", "type": "read"}, {"unit": "4A-9", "char": "楚", "pinyin": "chǔ", "meaning": "clear, distinct", "compounds": "清楚 · 楚楚", "type": "read"}, {"unit": "4A-9", "char": "橙", "pinyin": "chéng", "meaning": "orange (color/fruit)", "compounds": "橙色 · 橙汁 · 橙子", "type": "read"}, {"unit": "4A-9", "char": "民", "pinyin": "mín", "meaning": "people, civilian", "compounds": "人民 · 市民 · 民族", "type": "read"}, {"unit": "4A-9", "char": "沟", "pinyin": "gōu", "meaning": "ditch, groove, valley", "compounds": "沟通 · 水沟 · 山沟", "type": "read"}, {"unit": "4A-9", "char": "洁", "pinyin": "jié", "meaning": "clean, pure", "compounds": "清洁 · 洁净 · 整洁", "type": "read"}, {"unit": "4A-9", "char": "熟", "pinyin": "shú", "meaning": "ripe, cooked, familiar", "compounds": "成熟 · 熟悉 · 熟练", "type": "read"}, {"unit": "4A-9", "char": "牌", "pinyin": "pái", "meaning": "sign, brand, card", "compounds": "招牌 · 品牌 · 扑克牌", "type": "read"}, {"unit": "4A-9", "char": "盲", "pinyin": "máng", "meaning": "blind", "compounds": "盲人 · 色盲 · 盲目", "type": "read"}, {"unit": "4A-9", "char": "笨", "pinyin": "bèn", "meaning": "stupid, clumsy", "compounds": "笨蛋 · 愚笨 · 笨重", "type": "read"}, {"unit": "4A-9", "char": "糖", "pinyin": "táng", "meaning": "sugar, candy", "compounds": "糖果 · 白糖 · 冰糖", "type": "read"}, {"unit": "4A-9", "char": "而", "pinyin": "ér", "meaning": "and, but, while", "compounds": "而且 · 然而 · 从而", "type": "read"}, {"unit": "4A-9", "char": "般", "pinyin": "bān", "meaning": "kind, sort, appearance", "compounds": "一般 · 般配 · 这般", "type": "read"}, {"unit": "4A-9", "char": "辣", "pinyin": "là", "meaning": "spicy, hot (food)", "compounds": "辣椒 · 麻辣 · 火辣", "type": "read"}, {"unit": "4A-9", "char": "饮", "pinyin": "yǐn", "meaning": "to drink", "compounds": "饮料 · 饮水 · 饮食", "type": "read"}, {"unit": "4B-10", "char": "助", "pinyin": "zhù", "meaning": "to help, assist", "compounds": "帮助 · 助手 · 援助", "type": "write"}, {"unit": "4B-10", "char": "喊", "pinyin": "hǎn", "meaning": "to shout, call", "compounds": "大喊 · 呼喊 · 喊叫", "type": "write"}, {"unit": "4B-10", "char": "推", "pinyin": "tuī", "meaning": "to push, promote", "compounds": "推动 · 推荐 · 手推车", "type": "write"}, {"unit": "4B-10", "char": "教", "pinyin": "jiào", "meaning": "to teach, religion", "compounds": "教书 · 教室 · 宗教", "type": "write"}, {"unit": "4B-10", "char": "管", "pinyin": "guǎn", "meaning": "to manage, tube, pipe", "compounds": "管理 · 不管 · 水管", "type": "write"}, {"unit": "4B-10", "char": "难", "pinyin": "nán", "meaning": "difficult, hard", "compounds": "困难 · 难过 · 很难", "type": "write"}, {"unit": "4B-10", "char": "占", "pinyin": "zhàn", "meaning": "to occupy, account for", "compounds": "占领 · 占用 · 占据", "type": "read"}, {"unit": "4B-10", "char": "壶", "pinyin": "hú", "meaning": "pot, kettle", "compounds": "茶壶 · 水壶 · 酒壶", "type": "read"}, {"unit": "4B-10", "char": "拖", "pinyin": "tuō", "meaning": "to drag, delay", "compounds": "拖地 · 拖延 · 拖鞋", "type": "read"}, {"unit": "4B-10", "char": "敲", "pinyin": "qiāo", "meaning": "to knock, strike", "compounds": "敲门 · 敲击 · 推敲", "type": "read"}, {"unit": "4B-10", "char": "无", "pinyin": "wú", "meaning": "not have, without", "compounds": "无法 · 无聊 · 无关", "type": "read"}, {"unit": "4B-10", "char": "显", "pinyin": "xiǎn", "meaning": "obvious, to show", "compounds": "显然 · 显示 · 明显", "type": "read"}, {"unit": "4B-10", "char": "柜", "pinyin": "guì", "meaning": "cabinet, counter", "compounds": "柜子 · 书柜 · 衣柜", "type": "read"}, {"unit": "4B-10", "char": "洒", "pinyin": "sǎ", "meaning": "to sprinkle, spill", "compounds": "洒水 · 挥洒 · 洒脱", "type": "read"}, {"unit": "4B-10", "char": "烦", "pinyin": "fán", "meaning": "annoyed, trouble", "compounds": "烦恼 · 麻烦 · 厌烦", "type": "read"}, {"unit": "4B-10", "char": "粉", "pinyin": "fěn", "meaning": "powder, pink, noodles", "compounds": "米粉 · 面粉 · 粉色", "type": "read"}, {"unit": "4B-10", "char": "羞", "pinyin": "xiū", "meaning": "shy, ashamed", "compounds": "害羞 · 羞耻 · 羞愧", "type": "read"}, {"unit": "4B-10", "char": "肯", "pinyin": "kěn", "meaning": "willing, to agree", "compounds": "肯定 · 不肯 · 宁肯", "type": "read"}, {"unit": "4B-10", "char": "螃", "pinyin": "páng", "meaning": "crab", "compounds": "螃蟹", "type": "read"}, {"unit": "4B-10", "char": "蟹", "pinyin": "xiè", "meaning": "crab", "compounds": "螃蟹 · 蟹肉", "type": "read"}, {"unit": "4B-10", "char": "貌", "pinyin": "mào", "meaning": "appearance, looks", "compounds": "外貌 · 相貌 · 美貌", "type": "read"}, {"unit": "4B-11", "char": "举", "pinyin": "jǔ", "meaning": "to lift, raise, hold", "compounds": "举手 · 举行 · 选举", "type": "write"}, {"unit": "4B-11", "char": "取", "pinyin": "qǔ", "meaning": "to take, get, obtain", "compounds": "取得 · 争取 · 录取", "type": "write"}, {"unit": "4B-11", "char": "抱", "pinyin": "bào", "meaning": "to hold, hug, carry", "compounds": "拥抱 · 怀抱 · 抱住", "type": "write"}, {"unit": "4B-11", "char": "指", "pinyin": "zhǐ", "meaning": "finger, to point", "compounds": "手指 · 指出 · 指导", "type": "write"}, {"unit": "4B-11", "char": "级", "pinyin": "jí", "meaning": "grade, level, class", "compounds": "年级 · 高级 · 等级", "type": "write"}, {"unit": "4B-11", "char": "选", "pinyin": "xuǎn", "meaning": "to choose, select", "compounds": "选择 · 选举 · 挑选", "type": "write"}, {"unit": "4B-11", "char": "亚", "pinyin": "yà", "meaning": "Asia, second", "compounds": "亚洲 · 亚军 · 东亚", "type": "read"}, {"unit": "4B-11", "char": "令", "pinyin": "lìng", "meaning": "to order, command", "compounds": "命令 · 口令 · 法令", "type": "read"}, {"unit": "4B-11", "char": "优", "pinyin": "yōu", "meaning": "excellent, superior", "compounds": "优秀 · 优美 · 优势", "type": "read"}, {"unit": "4B-11", "char": "冠", "pinyin": "guàn", "meaning": "crown, champion", "compounds": "冠军 · 皇冠 · 夺冠", "type": "read"}, {"unit": "4B-11", "char": "奔", "pinyin": "bēn", "meaning": "to run, rush", "compounds": "奔跑 · 奔向 · 狂奔", "type": "read"}, {"unit": "4B-11", "char": "奖", "pinyin": "jiǎng", "meaning": "prize, reward", "compounds": "奖励 · 得奖 · 奖品", "type": "read"}, {"unit": "4B-11", "char": "席", "pinyin": "xí", "meaning": "seat, mat, banquet", "compounds": "座席 · 主席 · 酒席", "type": "read"}, {"unit": "4B-11", "char": "摔", "pinyin": "shuāi", "meaning": "to fall, throw", "compounds": "摔倒 · 摔跤 · 摔坏", "type": "read"}, {"unit": "4B-11", "char": "既", "pinyin": "jì", "meaning": "already, since, both", "compounds": "既然 · 既是 · 既…又…", "type": "read"}, {"unit": "4B-11", "char": "曲", "pinyin": "qǔ", "meaning": "song, melody, bent", "compounds": "歌曲 · 乐曲 · 弯曲", "type": "read"}, {"unit": "4B-11", "char": "枪", "pinyin": "qiāng", "meaning": "gun, rifle", "compounds": "手枪 · 步枪 · 玩具枪", "type": "read"}, {"unit": "4B-11", "char": "此", "pinyin": "cǐ", "meaning": "this, here", "compounds": "此时 · 如此 · 彼此", "type": "read"}, {"unit": "4B-11", "char": "焦", "pinyin": "jiāo", "meaning": "burnt, anxious", "compounds": "焦急 · 焦虑 · 烧焦", "type": "read"}, {"unit": "4B-11", "char": "秀", "pinyin": "xiù", "meaning": "beautiful, excellent", "compounds": "优秀 · 秀丽 · 表演秀", "type": "read"}, {"unit": "4B-11", "char": "秒", "pinyin": "miǎo", "meaning": "second (time)", "compounds": "几秒 · 秒钟 · 分秒", "type": "read"}, {"unit": "4B-11", "char": "绩", "pinyin": "jì", "meaning": "achievement, merit", "compounds": "成绩 · 业绩 · 功绩", "type": "read"}, {"unit": "4B-11", "char": "速", "pinyin": "sù", "meaning": "fast, speed", "compounds": "速度 · 快速 · 高速", "type": "read"}, {"unit": "4B-11", "char": "领", "pinyin": "lǐng", "meaning": "to lead, neck, collar", "compounds": "领导 · 衣领 · 带领", "type": "read"}, {"unit": "4B-11", "char": "飘", "pinyin": "piāo", "meaning": "to float, drift", "compounds": "飘动 · 飘扬 · 飘香", "type": "read"}, {"unit": "4B-12", "char": "传", "pinyin": "chuán", "meaning": "to pass on, spread", "compounds": "传说 · 传统 · 宣传", "type": "write"}, {"unit": "4B-12", "char": "假", "pinyin": "jià", "meaning": "holiday, false, fake", "compounds": "假日 · 放假 · 真假", "type": "write"}, {"unit": "4B-12", "char": "商", "pinyin": "shāng", "meaning": "business, merchant", "compounds": "商店 · 商人 · 商业", "type": "write"}, {"unit": "4B-12", "char": "围", "pinyin": "wéi", "meaning": "to surround, encircle", "compounds": "围绕 · 包围 · 周围", "type": "write"}, {"unit": "4B-12", "char": "块", "pinyin": "kuài", "meaning": "piece, lump, dollar", "compounds": "一块 · 石块 · 块头", "type": "write"}, {"unit": "4B-12", "char": "屋", "pinyin": "wū", "meaning": "house, room", "compounds": "房屋 · 屋子 · 屋顶", "type": "write"}, {"unit": "4B-12", "char": "热", "pinyin": "rè", "meaning": "hot, warm, enthusiastic", "compounds": "热情 · 炎热 · 发热", "type": "write"}, {"unit": "4B-12", "char": "突", "pinyin": "tū", "meaning": "sudden, to protrude", "compounds": "突然 · 突出 · 冲突", "type": "write"}, {"unit": "4B-12", "char": "群", "pinyin": "qún", "meaning": "group, crowd, flock", "compounds": "群体 · 人群 · 群众", "type": "write"}, {"unit": "4B-12", "char": "介", "pinyin": "jiè", "meaning": "between, to introduce", "compounds": "介绍 · 中介 · 简介", "type": "read"}, {"unit": "4B-12", "char": "充", "pinyin": "chōng", "meaning": "to fill, sufficient", "compounds": "充满 · 充电 · 充足", "type": "read"}, {"unit": "4B-12", "char": "兵", "pinyin": "bīng", "meaning": "soldier, army", "compounds": "士兵 · 军队 · 当兵", "type": "read"}, {"unit": "4B-12", "char": "列", "pinyin": "liè", "meaning": "row, line, to list", "compounds": "列车 · 排列 · 系列", "type": "read"}, {"unit": "4B-12", "char": "北", "pinyin": "běi", "meaning": "north", "compounds": "北方 · 北边 · 东北", "type": "read"}, {"unit": "4B-12", "char": "南", "pinyin": "nán", "meaning": "south", "compounds": "南方 · 南边 · 东南", "type": "read"}, {"unit": "4B-12", "char": "宾", "pinyin": "bīn", "meaning": "guest, visitor", "compounds": "宾客 · 来宾 · 主宾", "type": "read"}, {"unit": "4B-12", "char": "旅", "pinyin": "lǚ", "meaning": "travel, trip", "compounds": "旅行 · 旅游 · 旅客", "type": "read"}, {"unit": "4B-12", "char": "景", "pinyin": "jǐng", "meaning": "scenery, view", "compounds": "风景 · 景色 · 背景", "type": "read"}, {"unit": "4B-12", "char": "朝", "pinyin": "cháo", "meaning": "dynasty, towards, morning", "compounds": "朝代 · 朝向 · 今朝", "type": "read"}, {"unit": "4B-12", "char": "欣", "pinyin": "xīn", "meaning": "happy, delighted", "compounds": "欣赏 · 欣喜 · 欣然", "type": "read"}, {"unit": "4B-12", "char": "泉", "pinyin": "quán", "meaning": "spring, fountain", "compounds": "泉水 · 温泉 · 喷泉", "type": "read"}, {"unit": "4B-12", "char": "烈", "pinyin": "liè", "meaning": "intense, fierce", "compounds": "热烈 · 强烈 · 激烈", "type": "read"}, {"unit": "4B-12", "char": "纪", "pinyin": "jì", "meaning": "discipline, record, era", "compounds": "纪律 · 世纪 · 纪念", "type": "read"}, {"unit": "4B-12", "char": "绍", "pinyin": "shào", "meaning": "to continue, introduce", "compounds": "介绍 · 绍兴", "type": "read"}, {"unit": "4B-12", "char": "览", "pinyin": "lǎn", "meaning": "to look at, view", "compounds": "浏览 · 游览 · 博览", "type": "read"}, {"unit": "4B-12", "char": "赏", "pinyin": "shǎng", "meaning": "to appreciate, reward", "compounds": "欣赏 · 赏识 · 奖赏", "type": "read"}, {"unit": "4B-12", "char": "鹅", "pinyin": "é", "meaning": "goose", "compounds": "天鹅 · 鹅毛 · 白鹅", "type": "read"}, {"unit": "4B-13", "char": "刻", "pinyin": "kè", "meaning": "quarter hour, to carve", "compounds": "时刻 · 刻苦 · 雕刻", "type": "write"}, {"unit": "4B-13", "char": "婆", "pinyin": "pó", "meaning": "grandmother, old woman", "compounds": "婆婆 · 老婆 · 外婆", "type": "write"}, {"unit": "4B-13", "char": "宝", "pinyin": "bǎo", "meaning": "treasure, precious", "compounds": "宝贝 · 珍宝 · 国宝", "type": "write"}, {"unit": "4B-13", "char": "摸", "pinyin": "mō", "meaning": "to feel, touch", "compounds": "摸索 · 触摸 · 摸清", "type": "write"}, {"unit": "4B-13", "char": "特", "pinyin": "tè", "meaning": "special, particular", "compounds": "特别 · 特殊 · 独特", "type": "write"}, {"unit": "4B-13", "char": "男", "pinyin": "nán", "meaning": "male, man", "compounds": "男人 · 男孩 · 男女", "type": "write"}, {"unit": "4B-13", "char": "许", "pinyin": "xǔ", "meaning": "to allow, maybe", "compounds": "许可 · 也许 · 允许", "type": "write"}, {"unit": "4B-13", "char": "语", "pinyin": "yǔ", "meaning": "language, words", "compounds": "语言 · 汉语 · 外语", "type": "write"}, {"unit": "4B-13", "char": "丈", "pinyin": "zhàng", "meaning": "measure word, husband", "compounds": "丈夫 · 一丈 · 方丈", "type": "read"}, {"unit": "4B-13", "char": "之", "pinyin": "zhī", "meaning": "of, it, to go", "compounds": "之前 · 总之 · 之后", "type": "read"}, {"unit": "4B-13", "char": "仙", "pinyin": "xiān", "meaning": "fairy, immortal", "compounds": "仙女 · 神仙 · 仙境", "type": "read"}, {"unit": "4B-13", "char": "俱", "pinyin": "jù", "meaning": "all, completely", "compounds": "俱乐部 · 面面俱到", "type": "read"}, {"unit": "4B-13", "char": "剩", "pinyin": "shèng", "meaning": "to remain, left over", "compounds": "剩下 · 剩余 · 吃剩", "type": "read"}, {"unit": "4B-13", "char": "娘", "pinyin": "niáng", "meaning": "mother, lady", "compounds": "姑娘 · 大娘 · 新娘", "type": "read"}, {"unit": "4B-13", "char": "弹", "pinyin": "tán", "meaning": "to play (instrument), bullet", "compounds": "弹琴 · 子弹 · 弹性", "type": "read"}, {"unit": "4B-13", "char": "怒", "pinyin": "nù", "meaning": "angry, fury", "compounds": "愤怒 · 怒气 · 大怒", "type": "read"}, {"unit": "4B-13", "char": "扛", "pinyin": "káng", "meaning": "to carry on shoulder", "compounds": "扛着 · 扛起", "type": "read"}, {"unit": "4B-13", "char": "承", "pinyin": "chéng", "meaning": "to bear, inherit", "compounds": "承认 · 承担 · 继承", "type": "read"}, {"unit": "4B-13", "char": "拆", "pinyin": "chāi", "meaning": "to tear down, open", "compounds": "拆开 · 拆除 · 拆散", "type": "read"}, {"unit": "4B-13", "char": "拒", "pinyin": "jù", "meaning": "to refuse, reject", "compounds": "拒绝 · 拒收 · 抗拒", "type": "read"}, {"unit": "4B-13", "char": "拜", "pinyin": "bài", "meaning": "to worship, visit", "compounds": "拜访 · 崇拜 · 参拜", "type": "read"}, {"unit": "4B-13", "char": "挑", "pinyin": "tiāo", "meaning": "to carry, choose", "compounds": "挑选 · 挑战 · 挑剔", "type": "read"}, {"unit": "4B-13", "char": "柱", "pinyin": "zhù", "meaning": "pillar, post", "compounds": "柱子 · 石柱 · 支柱", "type": "read"}, {"unit": "4B-13", "char": "琴", "pinyin": "qín", "meaning": "musical instrument", "compounds": "钢琴 · 小提琴 · 古琴", "type": "read"}, {"unit": "4B-13", "char": "绝", "pinyin": "jué", "meaning": "to cut off, absolute", "compounds": "拒绝 · 绝对 · 断绝", "type": "read"}, {"unit": "4B-13", "char": "缩", "pinyin": "suō", "meaning": "to shrink, withdraw", "compounds": "缩小 · 收缩 · 退缩", "type": "read"}, {"unit": "4B-13", "char": "裂", "pinyin": "liè", "meaning": "to crack, split", "compounds": "破裂 · 裂缝 · 分裂", "type": "read"}, {"unit": "4B-13", "char": "钢", "pinyin": "gāng", "meaning": "steel", "compounds": "钢琴 · 钢铁 · 不锈钢", "type": "read"}, {"unit": "4B-14", "char": "典", "pinyin": "diǎn", "meaning": "dictionary, ceremony", "compounds": "词典 · 典礼 · 经典", "type": "write"}, {"unit": "4B-14", "char": "压", "pinyin": "yā", "meaning": "to press, pressure", "compounds": "压力 · 按压 · 压迫", "type": "write"}, {"unit": "4B-14", "char": "厨", "pinyin": "chú", "meaning": "kitchen", "compounds": "厨房 · 厨师 · 下厨", "type": "write"}, {"unit": "4B-14", "char": "慌", "pinyin": "huāng", "meaning": "hurried, flustered", "compounds": "慌张 · 惊慌 · 不慌", "type": "write"}, {"unit": "4B-14", "char": "乒", "pinyin": "pīng", "meaning": "ping (sound)", "compounds": "乒乓 · 乒乓球", "type": "read"}, {"unit": "4B-14", "char": "乓", "pinyin": "pāng", "meaning": "pong (sound)", "compounds": "乒乓 · 乒乓球", "type": "read"}, {"unit": "4B-14", "char": "凶", "pinyin": "xiōng", "meaning": "fierce, violent", "compounds": "凶猛 · 凶恶 · 吉凶", "type": "read"}, {"unit": "4B-14", "char": "匙", "pinyin": "chí", "meaning": "spoon", "compounds": "汤匙 · 茶匙 · 钥匙", "type": "read"}, {"unit": "4B-14", "char": "巧", "pinyin": "qiǎo", "meaning": "skillful, coincidental", "compounds": "巧合 · 技巧 · 灵巧", "type": "read"}, {"unit": "4B-14", "char": "怜", "pinyin": "lián", "meaning": "to pity", "compounds": "可怜 · 怜悯 · 爱怜", "type": "read"}, {"unit": "4B-14", "char": "拳", "pinyin": "quán", "meaning": "fist, boxing", "compounds": "拳头 · 太极拳 · 拳击", "type": "read"}, {"unit": "4B-14", "char": "欠", "pinyin": "qiàn", "meaning": "to owe, lack", "compounds": "欠债 · 拖欠 · 欠缺", "type": "read"}, {"unit": "4B-14", "char": "漫", "pinyin": "màn", "meaning": "to overflow, comic", "compounds": "漫画 · 浪漫 · 漫长", "type": "read"}, {"unit": "4B-14", "char": "皂", "pinyin": "zào", "meaning": "soap", "compounds": "肥皂 · 香皂", "type": "read"}, {"unit": "4B-14", "char": "穷", "pinyin": "qióng", "meaning": "poor, exhausted", "compounds": "贫穷 · 穷人 · 无穷", "type": "read"}, {"unit": "4B-14", "char": "竟", "pinyin": "jìng", "meaning": "unexpectedly, actually", "compounds": "竟然 · 究竟 · 毕竟", "type": "read"}, {"unit": "4B-14", "char": "筷", "pinyin": "kuài", "meaning": "chopsticks", "compounds": "筷子 · 一双筷子", "type": "read"}, {"unit": "4B-14", "char": "蕉", "pinyin": "jiāo", "meaning": "banana", "compounds": "香蕉 · 芭蕉", "type": "read"}, {"unit": "4B-14", "char": "铜", "pinyin": "tóng", "meaning": "copper, bronze", "compounds": "铜钱 · 青铜 · 铜像", "type": "read"}, {"unit": "4B-14", "char": "骂", "pinyin": "mà", "meaning": "to scold, curse", "compounds": "责骂 · 咒骂 · 挨骂", "type": "read"}, {"unit": "4B-15", "char": "刮", "pinyin": "guā", "meaning": "to scrape, blow (wind)", "compounds": "刮风 · 刮胡子 · 刮掉", "type": "write"}, {"unit": "4B-15", "char": "展", "pinyin": "zhǎn", "meaning": "to spread out, exhibit", "compounds": "展览 · 发展 · 展示", "type": "write"}, {"unit": "4B-15", "char": "希", "pinyin": "xī", "meaning": "to hope, rare", "compounds": "希望 · 希少 · 希奇", "type": "write"}, {"unit": "4B-15", "char": "望", "pinyin": "wàng", "meaning": "to hope, look at", "compounds": "希望 · 盼望 · 看望", "type": "write"}, {"unit": "4B-15", "char": "泳", "pinyin": "yǒng", "meaning": "to swim", "compounds": "游泳 · 泳池 · 蛙泳", "type": "write"}, {"unit": "4B-15", "char": "碰", "pinyin": "pèng", "meaning": "to touch, bump into", "compounds": "碰到 · 相碰 · 碰撞", "type": "write"}, {"unit": "4B-15", "char": "票", "pinyin": "piào", "meaning": "ticket, vote", "compounds": "车票 · 邮票 · 选票", "type": "write"}, {"unit": "4B-15", "char": "观", "pinyin": "guān", "meaning": "to watch, observe", "compounds": "观看 · 参观 · 观察", "type": "write"}, {"unit": "4B-15", "char": "世", "pinyin": "shì", "meaning": "world, generation", "compounds": "世界 · 世纪 · 一世", "type": "read"}, {"unit": "4B-15", "char": "京", "pinyin": "jīng", "meaning": "capital city", "compounds": "北京 · 南京 · 京城", "type": "read"}, {"unit": "4B-15", "char": "冬", "pinyin": "dōng", "meaning": "winter", "compounds": "冬天 · 冬季 · 寒冬", "type": "read"}, {"unit": "4B-15", "char": "堆", "pinyin": "duī", "meaning": "pile, heap, to pile up", "compounds": "一堆 · 堆积 · 垃圾堆", "type": "read"}, {"unit": "4B-15", "char": "夏", "pinyin": "xià", "meaning": "summer", "compounds": "夏天 · 夏季 · 盛夏", "type": "read"}, {"unit": "4B-15", "char": "季", "pinyin": "jì", "meaning": "season, quarter", "compounds": "季节 · 四季 · 雨季", "type": "read"}, {"unit": "4B-15", "char": "寄", "pinyin": "jì", "meaning": "to send, mail", "compounds": "寄信 · 邮寄 · 寄宿", "type": "read"}, {"unit": "4B-15", "char": "寒", "pinyin": "hán", "meaning": "cold", "compounds": "寒冷 · 严寒 · 寒假", "type": "read"}, {"unit": "4B-15", "char": "导", "pinyin": "dǎo", "meaning": "to guide, lead", "compounds": "导游 · 指导 · 领导", "type": "read"}, {"unit": "4B-15", "char": "春", "pinyin": "chūn", "meaning": "spring season", "compounds": "春天 · 春节 · 青春", "type": "read"}, {"unit": "4B-15", "char": "潮", "pinyin": "cháo", "meaning": "tide, moist, fashionable", "compounds": "潮水 · 潮湿 · 潮流", "type": "read"}, {"unit": "4B-15", "char": "炎", "pinyin": "yán", "meaning": "flame, hot", "compounds": "炎热 · 发炎 · 消炎", "type": "read"}, {"unit": "4B-15", "char": "爽", "pinyin": "shuǎng", "meaning": "refreshing, crisp", "compounds": "凉爽 · 爽快 · 干爽", "type": "read"}, {"unit": "4B-15", "char": "界", "pinyin": "jiè", "meaning": "boundary, world", "compounds": "世界 · 边界 · 各界", "type": "read"}, {"unit": "4B-15", "char": "盛", "pinyin": "shèng", "meaning": "flourishing, grand", "compounds": "盛开 · 盛大 · 茂盛", "type": "read"}, {"unit": "4B-15", "char": "秋", "pinyin": "qiū", "meaning": "autumn, fall", "compounds": "秋天 · 秋季 · 中秋", "type": "read"}, {"unit": "4B-15", "char": "舒", "pinyin": "shū", "meaning": "comfortable, to stretch", "compounds": "舒服 · 舒适 · 舒展", "type": "read"}, {"unit": "4B-15", "char": "袖", "pinyin": "xiù", "meaning": "sleeve", "compounds": "袖子 · 长袖 · 短袖", "type": "read"}, {"unit": "4B-15", "char": "邮", "pinyin": "yóu", "meaning": "post, mail", "compounds": "邮件 · 邮局 · 邮票", "type": "read"}, {"unit": "4B-15", "char": "雪", "pinyin": "xuě", "meaning": "snow", "compounds": "下雪 · 雪花 · 白雪", "type": "read"}, {"unit": "4B-16", "char": "奇", "pinyin": "qí", "meaning": "strange, wonderful", "compounds": "奇怪 · 好奇 · 神奇", "type": "write"}, {"unit": "4B-16", "char": "惊", "pinyin": "jīng", "meaning": "to startle, surprise", "compounds": "惊讶 · 吃惊 · 惊喜", "type": "write"}, {"unit": "4B-16", "char": "挂", "pinyin": "guà", "meaning": "to hang, worry about", "compounds": "悬挂 · 挂念 · 挂钩", "type": "write"}, {"unit": "4B-16", "char": "晒", "pinyin": "shài", "meaning": "to dry in sun, bask", "compounds": "晒太阳 · 晾晒 · 日晒", "type": "write"}, {"unit": "4B-16", "char": "枝", "pinyin": "zhī", "meaning": "branch, twig", "compounds": "树枝 · 花枝 · 枝条", "type": "write"}, {"unit": "4B-16", "char": "漂", "pinyin": "piāo", "meaning": "to float, drift", "compounds": "漂亮 · 漂流 · 漂浮", "type": "write"}, {"unit": "4B-16", "char": "鸡", "pinyin": "jī", "meaning": "chicken", "compounds": "小鸡 · 鸡蛋 · 公鸡", "type": "write"}, {"unit": "4B-16", "char": "鸭", "pinyin": "yā", "meaning": "duck", "compounds": "小鸭 · 鸭子 · 烤鸭", "type": "write"}, {"unit": "4B-16", "char": "与", "pinyin": "yǔ", "meaning": "and, with, to give", "compounds": "与其 · 参与 · 给与", "type": "read"}, {"unit": "4B-16", "char": "丑", "pinyin": "chǒu", "meaning": "ugly, shameful", "compounds": "丑陋 · 出丑 · 美丑", "type": "read"}, {"unit": "4B-16", "char": "侧", "pinyin": "cè", "meaning": "side, to lean", "compounds": "侧面 · 左侧 · 侧身", "type": "read"}, {"unit": "4B-16", "char": "哦", "pinyin": "ò", "meaning": "oh, I see", "compounds": "哦，是的", "type": "read"}, {"unit": "4B-16", "char": "壁", "pinyin": "bì", "meaning": "wall, cliff", "compounds": "墙壁 · 峭壁 · 隔壁", "type": "read"}, {"unit": "4B-16", "char": "牢", "pinyin": "láo", "meaning": "prison, firm, cage", "compounds": "监牢 · 牢固 · 坐牢", "type": "read"}, {"unit": "4B-16", "char": "绕", "pinyin": "rào", "meaning": "to wind around, bypass", "compounds": "围绕 · 绕道 · 缠绕", "type": "read"}, {"unit": "4B-16", "char": "膀", "pinyin": "bǎng", "meaning": "upper arm, wing", "compounds": "肩膀 · 翅膀 · 臂膀", "type": "read"}, {"unit": "4B-16", "char": "臂", "pinyin": "bì", "meaning": "arm", "compounds": "手臂 · 臂膀 · 双臂", "type": "read"}, {"unit": "4B-16", "char": "蛇", "pinyin": "shé", "meaning": "snake", "compounds": "毒蛇 · 蛇类 · 大蛇", "type": "read"}, {"unit": "4B-16", "char": "蝴", "pinyin": "hú", "meaning": "butterfly", "compounds": "蝴蝶", "type": "read"}, {"unit": "4B-16", "char": "蝶", "pinyin": "dié", "meaning": "butterfly", "compounds": "蝴蝶 · 蝶泳", "type": "read"}, {"unit": "4B-16", "char": "趴", "pinyin": "pā", "meaning": "to lie prone", "compounds": "趴下 · 趴着", "type": "read"}, {"unit": "4B-16", "char": "蹲", "pinyin": "dūn", "meaning": "to squat, crouch", "compounds": "蹲下 · 下蹲", "type": "read"}, {"unit": "4B-16", "char": "释", "pinyin": "shì", "meaning": "to release, explain", "compounds": "解释 · 释放 · 诠释", "type": "read"}, {"unit": "4B-16", "char": "钩", "pinyin": "gōu", "meaning": "hook, to hook", "compounds": "铁钩 · 钓钩 · 挂钩", "type": "read"}, {"unit": "4B-16", "char": "颈", "pinyin": "jǐng", "meaning": "neck", "compounds": "脖颈 · 长颈鹿", "type": "read"}, {"unit": "4B-16", "char": "鹿", "pinyin": "lù", "meaning": "deer", "compounds": "小鹿 · 鹿角 · 梅花鹿", "type": "read"}];
+
+const UNIT_ORDER = ["4A-1","4A-2","4A-3","4A-4","4A-5","4A-6","4A-7","4A-8","4A-9",
+                     "4B-10","4B-11","4B-12","4B-13","4B-14","4B-15","4B-16"];
+
+const UNIT_LABELS = {
+  "4A-1":"第一课","4A-2":"第二课","4A-3":"第三课","4A-4":"第四课","4A-5":"第五课",
+  "4A-6":"第六课","4A-7":"第七课","4A-8":"第八课","4A-9":"第九课",
+  "4B-10":"第十课","4B-11":"第十一课","4B-12":"第十二课","4B-13":"第十三课",
+  "4B-14":"第十四课","4B-15":"第十五课","4B-16":"第十六课"
+};
+
+// 语境选字 (MOE-style cloze) data — one original sentence + 3 confusable wrong characters,
+// scoped to the 102 识写字 (write-type) characters.
+const CLOZE_MAP = {"刚": {"sentence": "____才还下着雨，现在太阳怎么就出来了？", "wrongs": ["冈", "岗", "钢"]}, "外": {"sentence": "他从____国回来后，中文说得更好了。", "wrongs": ["歪", "位", "未"]}, "建": {"sentence": "政府计划在这里____造一座新的图书馆。", "wrongs": ["健", "键", "剑"]}, "彩": {"sentence": "舞台上的灯光五____缤纷，美丽极了。", "wrongs": ["采", "睬", "踩"]}, "拍": {"sentence": "弟弟用力____手，为运动员加油。", "wrongs": ["怕", "迫", "排"]}, "讨": {"sentence": "两人为了这件事____论了很久。", "wrongs": ["套", "掏", "逃"]}, "论": {"sentence": "他们讨____了半天，还是没有结果。", "wrongs": ["伦", "轮", "抡"]}, "部": {"sentence": "这本书他只看了一小____分。", "wrongs": ["步", "布", "怖"]}, "闻": {"sentence": "他一走进厨房，就____到饭菜的香味。", "wrongs": ["文", "纹", "蚊"]}, "串": {"sentence": "妹妹买了一____葡萄回家。", "wrongs": ["窜", "川", "穿"]}, "乌": {"sentence": "天空中飞过一群____鸦。", "wrongs": ["污", "屋", "无"]}, "怕": {"sentence": "妹妹很____黑，晚上不敢一个人睡觉。", "wrongs": ["帕", "爬", "扒"]}, "急": {"sentence": "看到火警，大家都很____忙地跑出教室。", "wrongs": ["级", "极", "集"]}, "偷": {"sentence": "小明发现有人____看他的考卷。", "wrongs": ["头", "投", "透"]}, "您": {"sentence": "老师，____好，请问办公室在哪里？", "wrongs": ["宁", "泞", "拧"]}, "架": {"sentence": "两个同学因为小事吵____起来。", "wrongs": ["嫁", "价", "驾"]}, "近": {"sentence": "我家就在学校附____。", "wrongs": ["进", "晋", "尽"]}, "净": {"sentence": "妈妈把厨房打扫得干____的。", "wrongs": ["静", "境", "竞"]}, "意": {"sentence": "这个问题的____思我不太明白。", "wrongs": ["义", "易", "议"]}, "脚": {"sentence": "他不小心扭伤了____踝。", "wrongs": ["角", "觉", "教"]}, "静": {"sentence": "图书馆里非常安____，大家都在看书。", "wrongs": ["净", "竟", "境"]}, "食": {"sentence": "这家餐厅的____物很美味。", "wrongs": ["识", "实", "时"]}, "任": {"sentence": "老师把管理班级的____务交给了班长。", "wrongs": ["认", "忍", "刃"]}, "伸": {"sentence": "猫咪懒洋洋地____了个懒腰。", "wrongs": ["深", "身", "申"]}, "功": {"sentence": "经过不断的练习，他终于成____了。", "wrongs": ["公", "工", "攻"]}, "室": {"sentence": "我们的教____在三楼。", "wrongs": ["式", "是", "世"]}, "束": {"sentence": "她手里拿着一____鲜花。", "wrongs": ["术", "述", "速"]}, "查": {"sentence": "警察正在____看案发现场。", "wrongs": ["察", "茶", "插"]}, "检": {"sentence": "医生帮他做了详细的体____。", "wrongs": ["简", "减", "剪"]}, "久": {"sentence": "他们已经很____没见面了。", "wrongs": ["旧", "酒", "救"]}, "健": {"sentence": "每天运动能让身体更____康。", "wrongs": ["建", "键", "舰"]}, "军": {"sentence": "叔叔是一名光荣的____人。", "wrongs": ["均", "君", "菌"]}, "始": {"sentence": "比赛即将开____了。", "wrongs": ["式", "是", "史"]}, "康": {"sentence": "祝您身体健____！", "wrongs": ["慷", "扛", "抗"]}, "所": {"sentence": "他不知道该怎么做，____以来问老师。", "wrongs": ["锁", "索", "缩"]}, "苦": {"sentence": "这碗药很____，弟弟喝了直皱眉。", "wrongs": ["库", "裤", "哭"]}, "思": {"sentence": "做数学题前要先仔细____考。", "wrongs": ["丝", "私", "司"]}, "抢": {"sentence": "小偷企图____走她的皮包。", "wrongs": ["枪", "呛", "强"]}, "拼": {"sentence": "他努力____命练习，终于考上了理想的学校。", "wrongs": ["贫", "品", "频"]}, "摇": {"sentence": "风一吹，树枝就轻轻____晃起来。", "wrongs": ["遥", "谣", "咬"]}, "馆": {"sentence": "我们周末常去图书____借书。", "wrongs": ["管", "官", "贯"]}, "司": {"sentence": "爸爸在一家大公____上班。", "wrongs": ["思", "丝", "私"]}, "救": {"sentence": "消防员及时赶到，____出了被困的小猫。", "wrongs": ["旧", "就", "究"]}, "照": {"sentence": "妈妈帮弟弟拍了一张____片。", "wrongs": ["招", "罩", "沼"]}, "被": {"sentence": "昨晚他盖着厚厚的____子睡觉。", "wrongs": ["背", "倍", "备"]}, "顾": {"sentence": "服务员很细心地照____每一位客人。", "wrongs": ["故", "固", "雇"]}, "味": {"sentence": "这道菜的____道非常特别。", "wrongs": ["未", "胃", "畏"]}, "居": {"sentence": "他们一家人____住在这栋公寓里。", "wrongs": ["举", "巨", "拒"]}, "店": {"sentence": "我们在那家书____买了几本漫画。", "wrongs": ["点", "电", "垫"]}, "座": {"sentence": "请问这个____位有人坐吗？", "wrongs": ["坐", "左", "作"]}, "清": {"sentence": "河水非常____澈，可以看到小鱼游动。", "wrongs": ["情", "青", "轻"]}, "离": {"sentence": "学校____我家不远。", "wrongs": ["梨", "璃", "黎"]}, "铁": {"sentence": "这辆____路列车准时到站。", "wrongs": ["贴", "帖", "跌"]}, "助": {"sentence": "同学们都很乐意互相帮____。", "wrongs": ["主", "住", "注"]}, "喊": {"sentence": "教练大声地____着队员的名字。", "wrongs": ["感", "敢", "憾"]}, "推": {"sentence": "他用力____开了那扇沉重的门。", "wrongs": ["腿", "退", "褪"]}, "教": {"sentence": "姐姐耐心地____我做功课。", "wrongs": ["较", "交", "郊"]}, "管": {"sentence": "妈妈每天都认真____理家里的大小事。", "wrongs": ["官", "馆", "贯"]}, "难": {"sentence": "这道数学题真的很____。", "wrongs": ["男", "南", "喃"]}, "举": {"sentence": "全班同学都____手回答问题。", "wrongs": ["巨", "拒", "距"]}, "取": {"sentence": "他终于____得了比赛的冠军。", "wrongs": ["娶", "趣", "趋"]}, "抱": {"sentence": "妈妈温柔地____着刚出生的妹妹。", "wrongs": ["饱", "跑", "泡"]}, "指": {"sentence": "老师用手____着黑板上的生字。", "wrongs": ["只", "纸", "止"]}, "级": {"sentence": "哥哥已经是六年____的学生了。", "wrongs": ["及", "急", "极"]}, "选": {"sentence": "班长是同学们____举出来的。", "wrongs": ["旋", "宣", "喧"]}, "传": {"sentence": "这个古老的故事一直流____到现在。", "wrongs": ["船", "串", "穿"]}, "假": {"sentence": "学校下周就要放____了。", "wrongs": ["嫁", "架", "价"]}, "商": {"sentence": "爸爸是一位成功的____人。", "wrongs": ["伤", "赏", "尚"]}, "围": {"sentence": "士兵们把整座城包____了起来。", "wrongs": ["为", "违", "维"]}, "块": {"sentence": "桌上放着一____蛋糕。", "wrongs": ["快", "筷", "蒯"]}, "屋": {"sentence": "爷爷住在村子里的一间老____子里。", "wrongs": ["乌", "污", "无"]}, "热": {"sentence": "今天的天气非常炎____。", "wrongs": ["乐", "惹", "若"]}, "突": {"sentence": "事情发生得太____然了，大家都没有准备。", "wrongs": ["凸", "秃", "图"]}, "群": {"sentence": "草原上有一____羊在吃草。", "wrongs": ["裙", "君", "郡"]}, "刻": {"sentence": "现在是五点三____。", "wrongs": ["克", "客", "课"]}, "婆": {"sentence": "外____常常给我讲故事。", "wrongs": ["波", "破", "泼"]}, "宝": {"sentence": "这是奶奶留下来的传家____贝。", "wrongs": ["饱", "抱", "保"]}, "摸": {"sentence": "弟弟伸手____了小猫的头。", "wrongs": ["磨", "模", "摩"]}, "特": {"sentence": "这家餐厅有一道很____别的菜。", "wrongs": ["替", "铁", "踢"]}, "男": {"sentence": "这个班级有二十个____生。", "wrongs": ["南", "喃", "楠"]}, "许": {"sentence": "妈妈不____我们在家里玩手机。", "wrongs": ["需", "须", "序"]}, "语": {"sentence": "她的英____说得非常流利。", "wrongs": ["雨", "与", "宇"]}, "典": {"sentence": "这本词____非常有用。", "wrongs": ["点", "电", "殿"]}, "压": {"sentence": "考试的____力让他晚上睡不着。", "wrongs": ["鸭", "呀", "牙"]}, "厨": {"sentence": "妈妈正在____房里煮饭。", "wrongs": ["除", "出", "初"]}, "慌": {"sentence": "听到警报声，大家都很____张。", "wrongs": ["荒", "黄", "谎"]}, "刮": {"sentence": "外面在____大风，记得带外套。", "wrongs": ["瓜", "刷", "挂"]}, "展": {"sentence": "学校举办了一场画____。", "wrongs": ["占", "战", "站"]}, "希": {"sentence": "我____望这次考试能考好。", "wrongs": ["西", "吸", "稀"]}, "望": {"sentence": "爷爷每天都在窗边____着远方。", "wrongs": ["忘", "网", "旺"]}, "泳": {"sentence": "暑假时，我们常去游____池玩水。", "wrongs": ["永", "咏", "涌"]}, "碰": {"sentence": "骑脚踏车时要小心，别____到别人。", "wrongs": ["棚", "朋", "硼"]}, "票": {"sentence": "妈妈买了两张电影____。", "wrongs": ["漂", "飘", "瓢"]}, "观": {"sentence": "我们一家人去____看了动物园的表演。", "wrongs": ["官", "管", "馆"]}, "奇": {"sentence": "这件事情真____怪，让人想不明白。", "wrongs": ["其", "骑", "棋"]}, "惊": {"sentence": "大家听到这个消息都很____讶。", "wrongs": ["京", "经", "精"]}, "挂": {"sentence": "墙上____着一幅美丽的画。", "wrongs": ["卦", "褂", "瓜"]}, "晒": {"sentence": "衣服挂在外面____太阳。", "wrongs": ["筛", "帅", "摔"]}, "枝": {"sentence": "大风把窗外的一____树都吹断了。", "wrongs": ["支", "肢", "知"]}, "漂": {"sentence": "河面上____着一片片落叶。", "wrongs": ["飘", "票", "瓢"]}, "鸡": {"sentence": "农场里养了很多____和鸭子。", "wrongs": ["级", "极", "击"]}, "鸭": {"sentence": "池塘里有几只小____在游泳。", "wrongs": ["压", "呀", "芽"]}};
+
+// ── STATE / STORAGE ─────────────────────────────────────────────────────
+const STORAGE_KEY = 'char_study_progress_v1';
+let mastery = {}; // char -> {learned:bool, quizPinyin:int, quizMeaning:int, writeDone:bool}
+let totalScore = 0;
+
+function loadMastery() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const save = JSON.parse(raw);
+      mastery = save.mastery || {};
+      totalScore = save.totalScore || 0;
+    }
+  } catch(e) {}
+}
+function saveMastery() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({mastery, totalScore})); } catch(e) {}
+}
+function getM(char) {
+  if (!mastery[char]) mastery[char] = {learned:false, quizPinyin:0, quizMeaning:0, quizMoe:0, writeDone:false};
+  if (mastery[char].quizMoe === undefined) mastery[char].quizMoe = 0;
+  return mastery[char];
+}
+function countMastered(words) {
+  return words.filter(w => {
+    const m = getM(w.char);
+    return m.learned && m.quizPinyin > 0 && m.quizMeaning > 0;
+  }).length;
+}
+function updateHeaderScore() {
+  document.getElementById('score-display').innerHTML = `<span>已掌握</span> ${countMastered(ALL_WORDS)} / ${ALL_WORDS.length}`;
+}
+
+// ── MISTAKE BOOK ──────────────────────────────────────────────────────────
+const MISTAKE_KEY = 'char_study_mistakes_v1';
+let mistakeBook = {}; // char -> {char,pinyin,meaning,compounds,unit,type,sources:{},missCount,correctStreak,lastMiss}
+const SOURCE_LABELS = {pinyin:'拼音测验', meaning:'意思测验', moe:'语境选字', write:'写字练习', learn:'学习卡'};
+
+function loadMistakes() {
+  try {
+    const raw = localStorage.getItem(MISTAKE_KEY);
+    if (raw) mistakeBook = JSON.parse(raw) || {};
+  } catch(e) { mistakeBook = {}; }
+}
+function saveMistakes() {
+  try { localStorage.setItem(MISTAKE_KEY, JSON.stringify(mistakeBook)); } catch(e) {}
+}
+function updateMistakePill() {
+  const count = Object.keys(mistakeBook).length;
+  document.getElementById('mistake-count').textContent = count;
+}
+function recordMistake(word, source) {
+  let entry = mistakeBook[word.char];
+  if (!entry) {
+    entry = { char: word.char, pinyin: word.pinyin, meaning: word.meaning, compounds: word.compounds,
+               unit: word.unit, type: word.type, sources: {}, missCount: 0, correctStreak: 0 };
+    mistakeBook[word.char] = entry;
+  }
+  entry.sources[source] = true;
+  entry.missCount++;
+  entry.correctStreak = 0;
+  entry.lastMiss = Date.now();
+  saveMistakes();
+  updateMistakePill();
+}
+function recordReviewCorrect(char) {
+  const entry = mistakeBook[char];
+  if (!entry) return;
+  entry.correctStreak = (entry.correctStreak || 0) + 1;
+  if (entry.correctStreak >= 2) delete mistakeBook[char];
+  saveMistakes();
+  updateMistakePill();
+}
+function removeMistake(char) {
+  delete mistakeBook[char];
+  saveMistakes();
+  updateMistakePill();
+  buildMistakeScreen();
+}
+function confirmClearMistakes() {
+  if (!confirm('确定要清空整个错题本吗？')) return;
+  mistakeBook = {};
+  saveMistakes();
+  updateMistakePill();
+  buildMistakeScreen();
+}
+function goToMistakeBook() {
+  clearTimers();
+  buildMistakeScreen();
+  showScreen('mistake-screen');
+  document.getElementById('header-title').textContent = '错题本';
+  document.getElementById('header-sub').textContent = '复习答错和写错的字';
+}
+function buildMistakeScreen() {
+  const list = Object.values(mistakeBook).sort((a,b) => b.missCount - a.missCount);
+  document.getElementById('mistake-sub').textContent = list.length
+    ? `共 ${list.length} 个字需要复习 · 复习答对两次会自动移出`
+    : '还没有错题，继续加油！';
+  document.getElementById('mistake-actions').style.display = list.length ? 'flex' : 'none';
+  const container = document.getElementById('mistake-list');
+  if (list.length === 0) {
+    container.innerHTML = `<div class="mistake-empty">🌿 太棒了，错题本是空的！</div>`;
+    return;
+  }
+  container.innerHTML = list.map(e => `
+    <div class="mistake-item">
+      <div class="mistake-char">${e.char}</div>
+      <div class="mistake-info">
+        <div class="mistake-meta"><strong>${e.pinyin}</strong> — ${e.meaning}</div>
+        <div class="mistake-sub-meta">${e.unit} · 错 ${e.missCount} 次</div>
+        <div class="mistake-badges">${Object.keys(e.sources).map(s => `<span class="mistake-badge">${SOURCE_LABELS[s]||s}</span>`).join('')}</div>
+      </div>
+      <button class="mistake-remove" onclick="removeMistake('${e.char}')">移除</button>
+    </div>
+  `).join('');
+}
+function startMistakeReview() {
+  const list = Object.values(mistakeBook);
+  if (list.length === 0) return;
+  const words = list.map(e => ({char:e.char, pinyin:e.pinyin, meaning:e.meaning, compounds:e.compounds, unit:e.unit, type:e.type}));
+  openModeScreen(words, '错题本复习', 'MISTAKES');
+}
+
+// ── SHOP / POINTS / BADGES / CRITTERS ──────────────────────────────────────
+const SHOP_KEY = 'char_study_shop_v1';
+
+const ACHIEVEMENTS = [
+  {id:'first_round', emoji:'🐾', name:'第一步', desc:'完成第一次练习', cond: () => shopState.roundsCompleted >= 1},
+  {id:'perfect_round', emoji:'🌟', name:'全对达人', desc:'一次练习全部答对', cond: () => shopState.hadPerfect === true},
+  {id:'streak5', emoji:'🔥', name:'连击新手', desc:'连续答对 5 题', cond: () => shopState.bestStreak >= 5},
+  {id:'streak10', emoji:'⚡', name:'连击高手', desc:'连续答对 10 题', cond: () => shopState.bestStreak >= 10},
+  {id:'rounds10', emoji:'📚', name:'勤奋小子', desc:'完成 10 次练习', cond: () => shopState.roundsCompleted >= 10},
+  {id:'rounds30', emoji:'🏅', name:'练习达人', desc:'完成 30 次练习', cond: () => shopState.roundsCompleted >= 30},
+  {id:'mistake_clear', emoji:'🧹', name:'错题清零', desc:'清空整本错题本', cond: () => shopState.hasHadMistake === true && Object.keys(mistakeBook).length === 0},
+  {id:'moe_master', emoji:'🧠', name:'语境高手', desc:'在语境选字中掌握所有识写字', cond: () => Object.keys(CLOZE_MAP).every(c => getM(c).quizMoe > 0)},
+  {id:'write_master', emoji:'✍️', name:'书写达人', desc:'写对所有识写字', cond: () => ALL_WORDS.filter(w=>w.type==='write').every(w => getM(w.char).writeDone)},
+  {id:'full_master', emoji:'🏆', name:'全能冠军', desc:'掌握全部 404 个生字', cond: () => ALL_WORDS.every(w => { const m=getM(w.char); return m.learned && m.quizPinyin>0 && m.quizMeaning>0; })}
+];
+
+const SHOP_ITEMS = [
+  {id:'shop_baby', emoji:'🐧', name:'企鹅宝宝', cost:30},
+  {id:'shop_scarf', emoji:'🐧🧣', name:'围巾企鹅', cost:30},
+  {id:'shop_snow', emoji:'🐧❄️', name:'雪天企鹅', cost:60},
+  {id:'shop_fish', emoji:'🐧🐟', name:'钓鱼企鹅', cost:60},
+  {id:'shop_sport', emoji:'🐧⚽', name:'运动企鹅', cost:100},
+  {id:'shop_art', emoji:'🐧🎨', name:'小画家企鹅', cost:100},
+  {id:'shop_music', emoji:'🐧🎵', name:'音乐企鹅', cost:150},
+  {id:'shop_book', emoji:'🐧📖', name:'爱读书企鹅', cost:150},
+  {id:'shop_grad', emoji:'🐧🎓', name:'毕业企鹅', cost:220},
+  {id:'shop_chef', emoji:'🐧🍳', name:'小厨师企鹅', cost:220},
+  {id:'shop_party', emoji:'🐧🎉', name:'派对企鹅', cost:300},
+  {id:'shop_love', emoji:'🐧💕', name:'爱心企鹅', cost:300},
+  {id:'shop_detective', emoji:'🐧🔍', name:'侦探企鹅', cost:400},
+  {id:'shop_ninja', emoji:'🐧🥷', name:'忍者企鹅', cost:400},
+  {id:'shop_wizard', emoji:'🐧🎩', name:'魔法企鹅', cost:520},
+  {id:'shop_hero', emoji:'🐧🦸', name:'超级企鹅', cost:520},
+  {id:'shop_pirate', emoji:'🐧🏴‍☠️', name:'海盗企鹅', cost:680},
+  {id:'shop_astro', emoji:'🐧🚀', name:'宇航员企鹅', cost:680},
+  {id:'shop_rainbow', emoji:'🐧🌈', name:'彩虹企鹅', cost:900},
+  {id:'shop_candy', emoji:'🐧🍬', name:'糖果企鹅', cost:900},
+  {id:'shop_royal', emoji:'🐧👑', name:'企鹅国王', cost:1200},
+  {id:'shop_golden', emoji:'🐧✨', name:'黄金企鹅', cost:1500}
+];
+
+function freshShop() {
+  return { points:0, badges:[], roundsCompleted:0, hadPerfect:false, bestStreak:0, hasHadMistake:false };
+}
+let shopState = freshShop();
+function loadShop() {
+  try {
+    const raw = localStorage.getItem(SHOP_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      shopState = {
+        points: Number(p.points) || 0,
+        badges: Array.isArray(p.badges) ? p.badges : [],
+        roundsCompleted: Number(p.roundsCompleted) || 0,
+        hadPerfect: !!p.hadPerfect,
+        bestStreak: Number(p.bestStreak) || 0,
+        hasHadMistake: !!p.hasHadMistake
+      };
+    }
+  } catch(e) { shopState = freshShop(); }
+}
+function saveShop() { try { localStorage.setItem(SHOP_KEY, JSON.stringify(shopState)); } catch(e) {} }
+function updatePointsPill() {
+  document.getElementById('points-count').textContent = shopState.points;
+}
+function awardPoints(n, reason) {
+  shopState.points += n;
+  if (Object.keys(mistakeBook).length > 0) shopState.hasHadMistake = true;
+  saveShop();
+  updatePointsPill();
+  checkBadges();
+}
+
+function renderHomeShelf() {
+  const row = document.getElementById('homeShelfRow');
+  const earned = shopState.badges.map(id => {
+    const a = ACHIEVEMENTS.find(x => x.id === id);
+    if (a) return {emoji:a.emoji, name:a.name};
+    const s = SHOP_ITEMS.find(x => x.id === id);
+    if (s) return {emoji:s.emoji, name:s.name};
+    return null;
+  }).filter(Boolean);
+  if (earned.length === 0) {
+    row.innerHTML = `<div class="shelf-empty">答题赚星星，换来你的第一只小企鹅吧 🐧</div>`;
+    return;
+  }
+  row.innerHTML = earned.map(b => `<div class="shelf-item"><div class="emoji">${b.emoji}</div><div class="sname">${b.name}</div></div>`).join('');
+}
+
+// Toast queue
+let toastQueue = [];
+let toastShowing = false;
+function queueToast(text) {
+  toastQueue.push(text);
+  if (!toastShowing) showNextToast();
+}
+function showNextToast() {
+  if (toastQueue.length === 0) { toastShowing = false; return; }
+  toastShowing = true;
+  const text = toastQueue.shift();
+  const el = document.getElementById('toast');
+  el.textContent = text;
+  el.classList.add('show');
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(showNextToast, 350);
+  }, 2200);
+}
+
+// Badge celebration modal queue
+let badgeModalQueue = [];
+let badgeModalShowing = false;
+function queueBadgeModal(a) {
+  badgeModalQueue.push(a);
+  if (!badgeModalShowing) showNextBadgeModal();
+}
+function showNextBadgeModal() {
+  if (badgeModalQueue.length === 0) { badgeModalShowing = false; return; }
+  badgeModalShowing = true;
+  const a = badgeModalQueue.shift();
+  document.getElementById('badgeModalEmoji').textContent = a.emoji;
+  document.getElementById('badgeModalName').textContent = a.name;
+  document.getElementById('badgeModalDesc').textContent = a.desc;
+  document.getElementById('badgeModalOverlay').classList.add('show');
+}
+function closeBadgeModal() {
+  document.getElementById('badgeModalOverlay').classList.remove('show');
+  setTimeout(showNextBadgeModal, 300);
+}
+
+function checkBadges() {
+  let changed = false;
+  ACHIEVEMENTS.forEach(a => {
+    if (shopState.badges.indexOf(a.id) === -1 && a.cond()) {
+      shopState.badges.push(a.id);
+      changed = true;
+      queueBadgeModal(a);
+    }
+  });
+  if (changed) { saveShop(); renderHomeShelf(); }
+}
+
+function goToBadges() {
+  clearTimers();
+  buildBadgesScreen();
+  showScreen('badges-screen');
+  document.getElementById('header-title').textContent = '徽章 & 商店';
+  document.getElementById('header-sub').textContent = '赚星星，换小企鹅';
+}
+
+function buildBadgesScreen() {
+  document.getElementById('badgesPoints').textContent = shopState.points;
+
+  const ag = document.getElementById('achievementGrid');
+  ag.innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = shopState.badges.indexOf(a.id) > -1;
+    return `<div class="badge-tile${unlocked ? '' : ' locked'}">
+      <div class="emoji">${a.emoji}</div>
+      <div class="bname">${a.name}</div>
+      <div class="bdesc">${unlocked ? '已解锁！' : a.desc}</div>
+    </div>`;
+  }).join('');
+
+  const sg = document.getElementById('shopGrid');
+  sg.innerHTML = SHOP_ITEMS.map(s => {
+    const owned = shopState.badges.indexOf(s.id) > -1;
+    if (owned) {
+      return `<div class="shop-tile owned">
+        <div class="emoji">${s.emoji}</div>
+        <div class="bname">${s.name}</div>
+        <div class="owned-tag">✓ 已拥有</div>
+      </div>`;
+    }
+    const canAfford = shopState.points >= s.cost;
+    return `<div class="shop-tile">
+      <div class="emoji">${s.emoji}</div>
+      <div class="bname">${s.name}</div>
+      <div class="cost">${s.cost} ⭐</div>
+      <button class="buy-btn" onclick="buyShopItem('${s.id}')" ${canAfford ? '' : 'disabled'}>兑换</button>
+    </div>`;
+  }).join('');
+}
+
+function buyShopItem(id) {
+  const item = SHOP_ITEMS.find(x => x.id === id);
+  if (!item || shopState.points < item.cost || shopState.badges.indexOf(id) > -1) return;
+  shopState.points -= item.cost;
+  shopState.badges.push(id);
+  saveShop();
+  updatePointsPill();
+  renderHomeShelf();
+  queueToast(`🎉 ${item.emoji} ${item.name} 加入你的企鹅岛啦！`);
+  buildBadgesScreen();
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+let currentUnit = null; // unit key or "ALL"
+let currentWords = [];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('back-arrow').style.display = (id === 'unit-screen') ? 'none' : 'inline';
+  document.getElementById('streak-display').style.display = (id === 'quiz-screen') ? 'inline-block' : 'none';
+}
+
+function goHome() {
+  clearTimers();
+  currentUnit = null;
+  buildUnitScreen();
+  renderHomeShelf();
+  updatePointsPill();
+  updateMistakePill();
+  showScreen('unit-screen');
+  document.getElementById('header-title').textContent = '生字学习';
+  document.getElementById('header-sub').textContent = '4A · 4B 生字练习';
+}
+
+function backToMode() {
+  clearTimers();
+  showScreen('mode-screen');
+}
+
+function buildUnitScreen() {
+  const slot = document.getElementById('mistake-callout-slot');
+  const mistakeCount = Object.keys(mistakeBook).length;
+  slot.innerHTML = mistakeCount > 0
+    ? `<div class="unit-card mistake-callout" onclick="goToMistakeBook()">
+         <div class="u-name">📕 错题本</div>
+         <div class="u-count">${mistakeCount} 个字等待复习 →</div>
+       </div>`
+    : '';
+
+  const gridA = document.getElementById('unit-grid-4a');
+  const gridB = document.getElementById('unit-grid-4b');
+  gridA.innerHTML = '';
+  gridB.innerHTML = '';
+
+  const allCard = document.createElement('div');
+  allCard.className = 'unit-card all-units';
+  const allMastered = countMastered(ALL_WORDS);
+  allCard.innerHTML = `<div class="u-name">全部单元（4A + 4B）</div>
+    <div class="u-count">共 ${ALL_WORDS.length} 个生字</div>
+    <div class="u-mastery">已掌握 ${allMastered} 个</div>`;
+  allCard.onclick = () => selectUnit('ALL');
+  gridA.appendChild(allCard);
+
+  document.querySelector('.book-label').insertAdjacentElement('afterend', gridB);
+
+  UNIT_ORDER.forEach(u => {
+    const words = ALL_WORDS.filter(w => w.unit === u);
+    const writeCount = words.filter(w => w.type === 'write').length;
+    const masteredCount = countMastered(words);
+    const card = document.createElement('div');
+    card.className = 'unit-card';
+    card.innerHTML = `<div class="u-name">${u} ${UNIT_LABELS[u]}</div>
+      <div class="u-count">${words.length} 字 · ${writeCount} 个识写字</div>
+      <div class="u-mastery">已掌握 ${masteredCount} / ${words.length}</div>`;
+    card.onclick = () => selectUnit(u);
+    if (u.startsWith('4A')) gridA.appendChild(card); else gridB.appendChild(card);
+  });
+}
+
+function selectUnit(u) {
+  const words = (u === 'ALL') ? [...ALL_WORDS] : ALL_WORDS.filter(w => w.unit === u);
+  const label = (u === 'ALL') ? '全部单元' : `${u} ${UNIT_LABELS[u]}`;
+  openModeScreen(words, label, u);
+}
+
+function openModeScreen(words, label, unitKey) {
+  currentUnit = unitKey;
+  currentWords = words;
+  document.getElementById('mode-unit-name').textContent = label;
+  const writeCount = words.filter(w => w.type === 'write').length;
+  document.getElementById('mode-unit-sub').textContent = `共 ${words.length} 个生字 · ${writeCount} 个识写字`;
+  document.getElementById('header-title').textContent = label;
+  document.getElementById('header-sub').textContent = '选择练习方式';
+
+  const wCard = document.getElementById('write-mode-card');
+  if (writeCount === 0) {
+    wCard.classList.add('disabled');
+    document.getElementById('write-mode-desc').textContent = unitKey === 'MISTAKES' ? '错题中没有需要书写的生字' : '这个单元没有需要书写的生字';
+    wCard.onclick = null;
+  } else {
+    wCard.classList.remove('disabled');
+    document.getElementById('write-mode-desc').textContent = '看笔顺动画，再照着描红练习书写（只练"识写字"）';
+    wCard.onclick = startWrite;
+  }
+  showScreen('mode-screen');
+}
+
+function clearTimers() {
+  if (quizState.timerInterval) clearInterval(quizState.timerInterval);
+}
+
+// ══════════════════════════ LEARN (FLASHCARD) MODE ══════════════════════════
+let learnState = { queue: [], idx: 0, flipped: false, results: {} };
+
+function startLearn() {
+  learnState.queue = shuffle(currentWords);
+  learnState.idx = 0;
+  learnState.results = {};
+  showScreen('learn-screen');
+  renderFlashcard();
+}
+
+function renderFlashcard() {
+  if (learnState.idx >= learnState.queue.length) {
+    finishLearnSession();
+    return;
+  }
+  const w = learnState.queue[learnState.idx];
+  learnState.flipped = false;
+  document.getElementById('flash-progress').textContent = `${learnState.idx + 1} / ${learnState.queue.length}`;
+  const tag = document.getElementById('flash-type-tag');
+  tag.textContent = w.type === 'write' ? '识写字' : '识读字';
+  tag.className = 'flash-type-tag ' + w.type;
+
+  const card = document.getElementById('flash-card');
+  card.innerHTML = `<span class="flash-type-tag ${w.type}">${w.type === 'write' ? '识写字' : '识读字'}</span>
+    <div class="flash-char" id="flash-char-front">${w.char}</div>
+    <div class="flash-hint">点一下卡片，看拼音和意思</div>`;
+  document.getElementById('flash-actions').style.display = 'none';
+}
+
+function flipCard() {
+  if (learnState.flipped) return;
+  learnState.flipped = true;
+  const w = learnState.queue[learnState.idx];
+  const card = document.getElementById('flash-card');
+  card.innerHTML = `<span class="flash-type-tag ${w.type}">${w.type === 'write' ? '识写字' : '识读字'}</span>
+    <div class="flash-back-pinyin">${w.pinyin}</div>
+    <div class="flash-back-meaning">${w.meaning}</div>
+    <div class="flash-back-compounds">${w.compounds}</div>`;
+  document.getElementById('flash-actions').style.display = 'flex';
+}
+
+function flashNext(remembered) {
+  const w = learnState.queue[learnState.idx];
+  const m = getM(w.char);
+  m.learned = remembered ? true : m.learned;
+  learnState.results[w.char] = remembered;
+  if (remembered) {
+    awardPoints(2, 'learn');
+    if (mistakeBook[w.char]) recordReviewCorrect(w.char);
+  } else {
+    recordMistake(w, 'learn');
+  }
+  saveMastery();
+  updateHeaderScore();
+  learnState.idx++;
+  renderFlashcard();
+}
+
+function finishLearnSession() {
+  const total = learnState.queue.length;
+  const remembered = Object.values(learnState.results).filter(v => v).length;
+  shopState.roundsCompleted++;
+  if (remembered === total && total > 0) shopState.hadPerfect = true;
+  saveShop();
+  checkBadges();
+  showResultsGeneric({
+    emoji: remembered === total ? '🌸' : '📖',
+    title: remembered === total ? '全部记住了！' : '学习卡完成',
+    subtitle: `${currentUnit === 'ALL' ? '全部单元' : currentUnit} · 记得 ${remembered} / ${total} 个字`,
+    statCorrect: `${remembered}/${total}`,
+    statScore: totalScore,
+    statStreak: '—',
+    struggles: Object.entries(learnState.results).filter(([c,v]) => !v).map(([c]) => currentWords.find(w=>w.char===c)),
+    retryFn: startLearn,
+    shareLabel: `学习卡 · 记得 ${remembered}/${total} 个字`
+  });
+}
+
+// ══════════════════════════ QUIZ MODE ══════════════════════════
+let quizState = {
+  level: 'pinyin', queue: [], qIdx: 0, score: 0, streak: 0, maxStreak: 0,
+  sessionCorrect: 0, sessionTotal: 0, wrongChars: {}, timerInterval: null,
+  timeLeft: 20, maxTime: 20, answered: false, currentQ: null
+};
+const QUIZ_LEVEL_LABEL = { pinyin: '拼音测验', meaning: '意思测验', moe: '语境选字', mixed: '综合测验卷' };
+const TIME_BY_LEVEL = { pinyin: 20, meaning: 22, moe: 25 };
+
+function unitDisplayLabel() {
+  if (currentUnit === 'ALL') return '全部单元';
+  if (currentUnit === 'EXAMBANK') return '综合测验卷';
+  if (currentUnit === 'MISTAKES') return '错题本复习';
+  return `${currentUnit} ${UNIT_LABELS[currentUnit] || ''}`.trim();
+}
+
+// Pick a random question sub-type for one word in a mixed (exam-bank) session.
+// Cloze (moe) only applies to the 102 识写字 characters, so weight accordingly.
+function pickRandomSubLevel(w) {
+  const hasCloze = !!CLOZE_MAP[w.char];
+  const r = Math.random();
+  if (hasCloze) {
+    if (r < 0.4) return 'pinyin';
+    if (r < 0.8) return 'meaning';
+    return 'moe';
+  }
+  return r < 0.5 ? 'pinyin' : 'meaning';
+}
+
+function setQuizLevel(lvl) {
+  if (lvl === 'moe' && currentWords.filter(w => CLOZE_MAP[w.char]).length === 0) {
+    queueToast('这个范围里没有语境选字题，换一个单元或选"全部单元"试试。');
+    return;
+  }
+  quizState.level = lvl;
+  document.getElementById('qtab-pinyin').classList.toggle('active', lvl === 'pinyin');
+  document.getElementById('qtab-meaning').classList.toggle('active', lvl === 'meaning');
+  document.getElementById('qtab-moe').classList.toggle('active', lvl === 'moe');
+  startQuizSession();
+}
+
+function startQuiz() {
+  if (quizState.level === 'mixed') quizState.level = 'pinyin';
+  document.getElementById('quiz-level-tabs').style.display = 'flex';
+  showScreen('quiz-screen');
+  setQuizLevel(quizState.level);
+}
+
+// ── EXAM BANK: one big randomized mixed-type session across all units ──────
+function startExamBank() {
+  currentUnit = 'EXAMBANK';
+  currentWords = shuffle(ALL_WORDS).slice(0, 40);
+  quizState.level = 'mixed';
+  document.getElementById('header-title').textContent = '综合测验卷';
+  document.getElementById('header-sub').textContent = '全单元随机抽题 · 拼音/意思/语境选字混合';
+  document.getElementById('quiz-level-tabs').style.display = 'none';
+  showScreen('quiz-screen');
+  startQuizSession();
+}
+
+function backFromQuiz() {
+  if (currentUnit === 'EXAMBANK') goHome();
+  else backToMode();
+}
+
+function startQuizSession() {
+  const pool = quizState.level === 'moe' ? currentWords.filter(w => CLOZE_MAP[w.char]) : currentWords;
+  quizState.queue = shuffle(pool);
+  quizState.qIdx = 0;
+  quizState.score = 0;
+  quizState.streak = 0;
+  quizState.maxStreak = 0;
+  quizState.sessionCorrect = 0;
+  quizState.sessionTotal = 0;
+  quizState.wrongChars = {};
+  quizState.maxTime = TIME_BY_LEVEL[quizState.level] || 22;
+  updateStreakUI();
+  renderQuizQuestion();
+}
+
+// Strip tone diacritics for pinyin comparison, e.g. "gāng" -> "gang"
+function stripTone(py) {
+  return py.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+function pinyinInitial(base) {
+  const m = base.match(/^(zh|ch|sh|[bpmfdtnlgkhjqxzcsryw])/);
+  return m ? m[0] : base[0] || '';
+}
+// Higher score = more confusable / better distractor
+function pinyinSimScore(a, b) {
+  const baseA = stripTone(a), baseB = stripTone(b);
+  if (baseA === baseB) return 3; // same syllable, different tone only
+  if (pinyinInitial(baseA) === pinyinInitial(baseB) && baseA[baseA.length-1] === baseB[baseB.length-1]) return 2;
+  if (pinyinInitial(baseA) === pinyinInitial(baseB)) return 1;
+  return 0;
+}
+const STOPWORDS = new Set(['to','a','an','the','of','or','and','be','in','on','at','is']);
+function meaningTokens(s) {
+  return s.toLowerCase().split(/[^a-z]+/).filter(t => t.length > 1 && !STOPWORDS.has(t));
+}
+function meaningOverlapScore(a, b) {
+  const ta = meaningTokens(a), tb = new Set(meaningTokens(b));
+  let n = 0;
+  ta.forEach(t => { if (tb.has(t)) n++; });
+  return n;
+}
+
+function buildQuizQuestion(w) {
+  const effectiveLevel = quizState.level === 'mixed' ? pickRandomSubLevel(w) : quizState.level;
+
+  if (effectiveLevel === 'moe') {
+    const entry = CLOZE_MAP[w.char];
+    const options = shuffle([w.char, ...entry.wrongs]);
+    const correctIdx = options.indexOf(w.char);
+    return {
+      qText: entry.sentence,
+      qSub: '从 1、2、3、4 中选出最合适的字，填在横线上。',
+      options, correctIdx, word: w, isSentence: true, level: effectiveLevel
+    };
+  }
+
+  const isPinyin = effectiveLevel === 'pinyin';
+  const field = isPinyin ? 'pinyin' : 'meaning';
+  const correctAnswer = w[field];
+  const pool = (currentWords.length >= 4 ? currentWords : ALL_WORDS).filter(x => x.char !== w.char);
+
+  // Rank candidates by how confusable they are, so wrong answers aren't just random.
+  const scored = pool.map(x => ({
+    val: x[field],
+    score: isPinyin ? pinyinSimScore(w.pinyin, x.pinyin) : (meaningOverlapScore(w.meaning, x.meaning) * 10 + pinyinSimScore(w.pinyin, x.pinyin))
+  }));
+  const seen = new Set();
+  const deduped = [];
+  shuffle(scored).forEach(s => { if (!seen.has(s.val) && s.val !== correctAnswer) { seen.add(s.val); deduped.push(s); } });
+  deduped.sort((a, b) => b.score - a.score);
+  const wrongs = deduped.slice(0, 3).map(s => s.val);
+
+  const options = shuffle([...wrongs, correctAnswer]);
+  const correctIdx = options.indexOf(correctAnswer);
+  return {
+    qText: w.char,
+    qSub: isPinyin ? '这个字的拼音是？' : `(${w.pinyin}) · 这个字的意思是？`,
+    options, correctIdx, word: w, level: effectiveLevel
+  };
+}
+
+function renderQuizQuestion() {
+  if (quizState.qIdx >= quizState.queue.length) {
+    finishQuizSession();
+    return;
+  }
+  quizState.answered = false;
+  const w = quizState.queue[quizState.qIdx];
+  const q = buildQuizQuestion(w);
+  quizState.currentQ = q;
+
+  const total = quizState.queue.length;
+  document.getElementById('q-eyebrow').textContent = quizState.level === 'mixed'
+    ? `${QUIZ_LEVEL_LABEL.mixed} · ${QUIZ_LEVEL_LABEL[q.level]} · 第 ${quizState.qIdx+1} 题 / 共 ${total} 题`
+    : `${QUIZ_LEVEL_LABEL[q.level]} · 第 ${quizState.qIdx+1} 题 / 共 ${total} 题`;
+  document.getElementById('q-text').textContent = q.qText;
+  document.getElementById('q-text').classList.toggle('q-text-sentence', !!q.isSentence);
+  document.getElementById('q-sub').textContent = q.qSub;
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  const letters = q.level === 'moe' ? ['1','2','3','4'] : ['A','B','C','D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => handleQuizAnswer(i);
+    grid.appendChild(btn);
+  });
+
+  document.getElementById('feedback-panel').className = 'feedback-panel';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  const pct = (quizState.qIdx / total) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${quizState.qIdx} / ${total}`;
+
+  quizState.maxTime = TIME_BY_LEVEL[q.level] || 22;
+  startQuizTimer();
+}
+
+function startQuizTimer() {
+  clearInterval(quizState.timerInterval);
+  quizState.timeLeft = quizState.maxTime;
+  updateTimerUI();
+  quizState.timerInterval = setInterval(() => {
+    quizState.timeLeft--;
+    updateTimerUI();
+    if (quizState.timeLeft <= 0) {
+      clearInterval(quizState.timerInterval);
+      if (!quizState.answered) handleQuizAnswer(-1);
+    }
+  }, 1000);
+}
+function updateTimerUI() {
+  const pct = (quizState.timeLeft / quizState.maxTime) * 100;
+  document.getElementById('timer-fill').style.width = pct + '%';
+  document.getElementById('timer-fill').style.background = quizState.timeLeft <= 5 ? 'var(--wrong)' : 'var(--dusty-rose)';
+  document.getElementById('timer-label').textContent = quizState.timeLeft;
+}
+
+function handleQuizAnswer(chosenIdx) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  clearInterval(quizState.timerInterval);
+
+  const q = quizState.currentQ;
+  const correct = chosenIdx === q.correctIdx;
+  const timeBonus = Math.floor(quizState.timeLeft / 2);
+  quizState.sessionTotal++;
+
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.correctIdx) btn.classList.add(correct && i === chosenIdx ? 'correct' : 'reveal-correct');
+    else if (i === chosenIdx && !correct) btn.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback-panel');
+  const fbResult = document.getElementById('fb-result');
+  const fbDetail = document.getElementById('fb-detail');
+
+  const m = getM(q.word.char);
+  if (correct) {
+    quizState.sessionCorrect++;
+    quizState.streak++;
+    if (quizState.streak > quizState.maxStreak) quizState.maxStreak = quizState.streak;
+    const points = 10 + timeBonus + (quizState.streak > 2 ? 5 : 0);
+    quizState.score += points;
+    totalScore += points;
+    if (q.level === 'pinyin') m.quizPinyin++;
+    else if (q.level === 'meaning') m.quizMeaning++;
+    else m.quizMoe++;
+    if (mistakeBook[q.word.char]) recordReviewCorrect(q.word.char);
+    awardPoints(Math.max(2, Math.round(points / 2)), 'quiz');
+    fbResult.className = 'feedback-result ok';
+    const streakMsg = quizState.streak >= 3 ? ` 🔥 ${quizState.streak} 连击！` : '';
+    fbResult.textContent = `✓ 正确！+${points} 分${streakMsg}`;
+    fb.className = 'feedback-panel show';
+  } else {
+    quizState.streak = 0;
+    quizState.wrongChars[q.word.char] = (quizState.wrongChars[q.word.char] || 0) + 1;
+    recordMistake(q.word, q.level);
+    fbResult.className = 'feedback-result no';
+    fbResult.textContent = chosenIdx === -1 ? '⏱ 时间到！' : '✗ 再想想';
+    fb.className = 'feedback-panel show wrong-fb';
+  }
+  const clozeEntry = CLOZE_MAP[q.word.char];
+  fbDetail.innerHTML = `<strong>${q.word.char}</strong> (${q.word.pinyin}) — ${q.word.meaning}<br>
+    <span style="color:var(--mid)">${q.word.compounds}</span>` +
+    (clozeEntry ? `<br><span style="color:var(--mid)">例句：${clozeEntry.sentence.replace('____', q.word.char)}</span>` : '');
+
+  document.getElementById('next-btn').className = 'next-btn show';
+  saveMastery();
+  updateHeaderScore();
+  updateStreakUI();
+}
+
+function updateStreakUI() {
+  document.getElementById('streak-display').textContent = `🔥 ${quizState.streak}`;
+}
+
+function nextQuestion() {
+  quizState.qIdx++;
+  renderQuizQuestion();
+}
+
+function finishQuizSession() {
+  const pct = Math.round((quizState.sessionCorrect / quizState.sessionTotal) * 100);
+  const emoji = pct >= 90 ? '🌸' : pct >= 70 ? '✨' : pct >= 50 ? '💪' : '📖';
+  const title = pct >= 90 ? '太棒了！' : pct >= 70 ? '做得不错！' : pct >= 50 ? '继续加油！' : '再练习一下吧！';
+  const struggles = Object.entries(quizState.wrongChars).sort((a,b)=>b[1]-a[1]).slice(0,6)
+    .map(([c,count]) => ({...currentWords.find(w=>w.char===c), count}));
+  const levelLabel = QUIZ_LEVEL_LABEL[quizState.level];
+
+  shopState.roundsCompleted++;
+  if (pct === 100) shopState.hadPerfect = true;
+  if (quizState.maxStreak > shopState.bestStreak) shopState.bestStreak = quizState.maxStreak;
+  saveShop();
+  checkBadges();
+
+  showResultsGeneric({
+    emoji, title,
+    subtitle: `${levelLabel} · 答对 ${pct}%`,
+    statCorrect: `${quizState.sessionCorrect}/${quizState.sessionTotal}`,
+    statScore: quizState.score,
+    statStreak: quizState.maxStreak,
+    struggles,
+    retryFn: currentUnit === 'EXAMBANK' ? startExamBank : startQuizSession,
+    shareLabel: `${levelLabel} · 答对 ${quizState.sessionCorrect}/${quizState.sessionTotal}（${pct}%）· 得分 ${quizState.score} · 最长连击 ${quizState.maxStreak}`
+  });
+}
+
+// ══════════════════════════ WRITE MODE ══════════════════════════
+let writeState = { queue: [], idx: 0, writer: null, results: {}, testMode: false };
+
+function startWrite() {
+  const writeWords = currentWords.filter(w => w.type === 'write');
+  if (writeWords.length === 0) return;
+  writeState.queue = shuffle(writeWords);
+  writeState.idx = 0;
+  writeState.results = {};
+  writeState.testMode = false;
+  document.getElementById('wm-practice').classList.add('active');
+  document.getElementById('wm-test').classList.remove('active');
+  showScreen('write-screen');
+  renderWriteCard();
+}
+
+function setWriteMode(isTest) {
+  writeState.testMode = isTest;
+  document.getElementById('wm-practice').classList.toggle('active', !isTest);
+  document.getElementById('wm-test').classList.toggle('active', isTest);
+  renderWriteCard();
+}
+
+function renderWriteCard() {
+  if (writeState.idx >= writeState.queue.length) {
+    finishWriteSession();
+    return;
+  }
+  const w = writeState.queue[writeState.idx];
+  document.getElementById('write-progress').textContent = `${writeState.idx + 1} / ${writeState.queue.length}`;
+  document.getElementById('write-pinyin').textContent = w.pinyin;
+  document.getElementById('write-meaning').textContent = w.meaning;
+  document.getElementById('write-status').textContent = '';
+  document.getElementById('write-status').className = 'write-status';
+  document.getElementById('write-next-btn').className = 'next-btn';
+
+  const target = document.getElementById('hanzi-target');
+  target.innerHTML = '';
+
+  const isTest = writeState.testMode;
+  document.getElementById('write-hidden-hint').style.display = isTest ? 'block' : 'none';
+  document.getElementById('demo-stroke-btn').style.display = isTest ? 'none' : 'block';
+
+  if (typeof HanziWriter === 'undefined') {
+    document.getElementById('write-status').textContent = '⚠ 笔顺组件加载失败，请检查网络连接后重新整理页面。';
+    return;
+  }
+
+  writeState.writer = HanziWriter.create('hanzi-target', w.char, {
+    width: 260, height: 260, padding: 5,
+    showOutline: !isTest,
+    strokeAnimationSpeed: 1,
+    delayBetweenStrokes: 200,
+    strokeColor: '#1B4965',
+    outlineColor: '#D6EAF8',
+    drawingColor: '#3E8FC4'
+  });
+}
+
+function demoStroke() {
+  if (writeState.writer && !writeState.testMode) writeState.writer.animateCharacter();
+}
+
+function startTrace() {
+  if (!writeState.writer) return;
+  const w = writeState.queue[writeState.idx];
+  const isTest = writeState.testMode;
+  document.getElementById('write-status').textContent = isTest ? '凭记忆写出这个字…' : '照着虚线笔画描红吧…';
+  document.getElementById('write-status').className = 'write-status';
+  writeState.writer.quiz({
+    showHintAfterMisses: isTest ? false : 2,
+    leniency: isTest ? 1.4 : 1.7,
+    onComplete: function(summary) {
+      const mistakes = summary.totalMistakes;
+      const good = isTest ? mistakes <= 1 : mistakes <= 2;
+      writeState.results[w.char] = { mistakes, good };
+      const m = getM(w.char);
+      if (good) {
+        if (isTest) m.writeTestDone = true; else m.writeDone = true;
+        if (mistakeBook[w.char]) recordReviewCorrect(w.char);
+        awardPoints(isTest ? 12 : 6, 'write');
+      } else {
+        recordMistake(w, 'write');
+      }
+      saveMastery();
+      updateHeaderScore();
+      document.getElementById('write-status').textContent = good
+        ? `✓ 写得很好！错误 ${mistakes} 次`
+        : `完成，错误 ${mistakes} 次 — 可以再练一次`;
+      document.getElementById('write-status').className = 'write-status' + (good ? ' ok' : '');
+      document.getElementById('write-next-btn').className = 'next-btn show';
+    }
+  });
+}
+
+function nextWrite() {
+  writeState.idx++;
+  renderWriteCard();
+}
+
+function finishWriteSession() {
+  const total = writeState.queue.length;
+  const goodCount = Object.values(writeState.results).filter(r => r.good).length;
+  const struggles = Object.entries(writeState.results).filter(([c,r]) => !r.good)
+    .map(([c,r]) => ({...writeState.queue.find(w=>w.char===c), count: r.mistakes}));
+
+  shopState.roundsCompleted++;
+  if (goodCount === total && total > 0) shopState.hadPerfect = true;
+  saveShop();
+  checkBadges();
+
+  showResultsGeneric({
+    emoji: goodCount === total ? '🌸' : '🖌️',
+    title: goodCount === total ? '笔顺都写对了！' : '写字练习完成',
+    subtitle: `${currentUnit === 'ALL' ? '全部单元' : currentUnit} · 写对 ${goodCount} / ${total} 个字`,
+    statCorrect: `${goodCount}/${total}`,
+    statScore: totalScore,
+    statStreak: '—',
+    struggles,
+    retryFn: startWrite,
+    shareLabel: `写字练习 · 写对 ${goodCount}/${total} 个字`
+  });
+}
+
+// ══════════════════════════ RESULTS (SHARED) ══════════════════════════
+let lastShareText = '';
+function showResultsGeneric(cfg) {
+  clearTimers();
+  showScreen('results-screen');
+  document.getElementById('results-emoji').textContent = cfg.emoji;
+  document.getElementById('results-title').textContent = cfg.title;
+  document.getElementById('results-subtitle').textContent = cfg.subtitle;
+  document.getElementById('stat-correct').textContent = cfg.statCorrect;
+  document.getElementById('stat-score').textContent = cfg.statScore;
+  document.getElementById('stat-streak').textContent = cfg.statStreak;
+
+  const sl = document.getElementById('struggle-list');
+  const struggles = (cfg.struggles || []).filter(Boolean);
+  if (struggles.length > 0) {
+    sl.innerHTML = `<div class="struggle-title">需要多练习的字</div>` +
+      struggles.map(w => `<div class="struggle-item">
+          <div><strong>${w.char}</strong> <span style="color:var(--mid)">${w.pinyin}</span></div>
+          ${w.count ? `<span class="struggle-count">错 ${w.count} 次</span>` : ''}
+        </div>`).join('');
+  } else {
+    sl.innerHTML = `<div style="text-align:center;padding:14px;color:var(--sage);font-weight:600;">🌿 全部完成，表现很好！</div>`;
+  }
+
+  document.getElementById('share-card').className = 'share-card';
+  const date = new Date().toLocaleDateString('zh-SG');
+  lastShareText = `📚 生字学习 · ${unitDisplayLabel()}
+日期：${date}
+${cfg.shareLabel}${struggles.length ? `\n需要加强：${struggles.map(w=>w.char).join('、')}` : '\n全部掌握！🌸'}`;
+  document.getElementById('share-text').textContent = lastShareText;
+
+  resultsRetryFn = cfg.retryFn;
+}
+let resultsRetryFn = null;
+function retrySession() { if (resultsRetryFn) resultsRetryFn(); }
+function showShare() {
+  document.getElementById('share-card').className = 'share-card show';
+}
+function copyShare() {
+  navigator.clipboard.writeText(lastShareText).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ 已复制！';
+    setTimeout(() => btn.textContent = '复制文字', 2000);
+  });
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────────
+loadMastery();
+loadMistakes();
+loadShop();
+updateHeaderScore();
+updateMistakePill();
+updatePointsPill();
+renderHomeShelf();
+buildUnitScreen();
+</script>
+</body>
+</html>
